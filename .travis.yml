@@ -19,11 +19,11 @@ android:
 before_script:
   # Create and start emulator
   - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &amp;
+  - emulator -avd test -no-skin -no-audio -no-window &
 
 script:
   - ./gradlew check -PdisablePreDex --continue --stacktrace
     - android-wait-for-emulator
     - adb devices
-    - adb shell input keyevent 82 &amp;
+    - adb shell input keyevent 82 &
     - ./gradlew connectedAndroidTest -PdisablePreDex --continue --stacktrace
