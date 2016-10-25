@@ -40,10 +40,18 @@ public class CadastraTagsActivity extends AppCompatActivity {
                     return;
                 }
                 //Verifica se existe checklist igual
-                ArrayList<String> listaTotal = bd.leChecklist();
+                ArrayList<String> listaTotal = bd.leTags();
 
-                if (listaTotal.contains(txtTitulo.getText().toString())) {
-                    txtTitulo.setError("Já existe uma checklist com esse nome salva!");
+                if (!listaTotal.contains(txtTitulo.getText().toString()))
+                    for (int i = 0; i < listaTotal.size(); i++) {
+                        if (verificaCaseSensitivity(listaTotal.get(i), listaTotal)){
+                            txtTitulo.setError("Já existe uma tag com esse rótulo!");
+                            txtTitulo.setText("");
+                            return;
+                        }
+                    }
+                else {
+                    txtTitulo.setError("Já existe uma tag com esse rótulo!");
                     txtTitulo.setText("");
                     return;
                 }
@@ -65,6 +73,13 @@ public class CadastraTagsActivity extends AppCompatActivity {
                 finish();
             }
         } );
+    }
+
+    public boolean verificaCaseSensitivity(String palavra, ArrayList<String> lista){
+        for (String string : lista)
+            if (string.equalsIgnoreCase(palavra))
+                return true;
+        return false;
     }
 
 }

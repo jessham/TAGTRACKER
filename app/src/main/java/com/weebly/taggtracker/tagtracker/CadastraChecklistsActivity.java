@@ -21,11 +21,7 @@ import java.util.ArrayList;
 
 public class CadastraChecklistsActivity extends AppCompatActivity {
     DatabaseHelper bd;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+
 
     public CadastraChecklistsActivity() {
         bd = new DatabaseHelper(this);
@@ -61,8 +57,16 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                 //Verifica se existe checklist igual
                 ArrayList<String> listaTotal = bd.leChecklist();
 
-                if (listaTotal.contains(txtTitulo.getText().toString())) {
-                    txtTitulo.setError("Já existe uma checklist com esse nome salva!");
+                if (!listaTotal.contains(txtTitulo.getText().toString()))
+                    for (int i = 0; i < listaTotal.size(); i++) {
+                        if (verificaCaseSensitivity(listaTotal.get(i), listaTotal)){
+                            txtTitulo.setError("Já existe uma checklist com esse título!");
+                            txtTitulo.setText("");
+                            return;
+                        }
+                    }
+                else {
+                    txtTitulo.setError("Já existe uma checklist com esse título!");
                     txtTitulo.setText("");
                     return;
                 }
@@ -84,45 +88,13 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("CadastraChecklists Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
+    public boolean verificaCaseSensitivity(String palavra, ArrayList<String> lista){
+        for (String string : lista)
+            if (string.equalsIgnoreCase(palavra))
+                return true;
+        return false;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
-    }
 }
