@@ -160,18 +160,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //LEITURA
     public ArrayList<String> leChecklist(){
+        SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<String> resp = new ArrayList<String>();
 
         try {
-            Cursor cursor = getReadableDatabase().rawQuery("select * from " + tabelaChecklists.nomeTabela, null);
+            Cursor cursor = db.rawQuery("select " + tabelaChecklists.colunaTitulo +
+                                                    " from " + tabelaChecklists.nomeTabela, null);
 
             if (cursor.moveToFirst()) {
                 do {
-                    String linea = "[" + cursor.getInt(0) + "] " + cursor.getString(1);
+                    String linea = cursor.getString(0);
                     resp.add(linea);
                 } while (cursor.moveToNext());
             }
             cursor.close();
+            db.close();
         }  catch (Exception e){
             Toast.makeText(contexto,R.string.erro_exibirChecklist,Toast.LENGTH_SHORT).show();
         }
@@ -181,17 +184,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<String> leTags(){
         ArrayList<String> resp = new ArrayList<String>();
+        SQLiteDatabase db = this.getReadableDatabase();
 
         try {
-            Cursor cursor = getReadableDatabase().rawQuery("select * from " + tabelaTags.nomeTabela, null);
+            Cursor cursor = db.rawQuery("select " + tabelaTags.colunaTitulo +
+                                        " from " + tabelaTags.nomeTabela, null);
 
             if (cursor.moveToFirst()) {
                 do {
-                    String linea = "<" + cursor.getInt(0) + "> " + cursor.getString(1);
+                    String linea = cursor.getString(0);
                     resp.add(linea);
                 } while (cursor.moveToNext());
             }
             cursor.close();
+            db.close();
         } catch (Exception e){
             Toast.makeText(contexto,R.string.erro_exibirTags,Toast.LENGTH_SHORT).show();
         }
