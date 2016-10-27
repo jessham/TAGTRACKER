@@ -7,20 +7,28 @@ import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.weebly.taggtracker.tagtracker.models.CheckList;
 
 import java.util.ArrayList;
 
 public class CadastraChecklistsActivity extends AppCompatActivity {
     DatabaseHelper bd;
+    MultiAutoCompleteTextView autocompleta;
+
 
 
     public CadastraChecklistsActivity() {
@@ -32,6 +40,17 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastra_checklists);
+
+
+        //Criamos o array de dados e o colocamos no adapter
+        ArrayList array = bd.leTags();
+        final ArrayAdapter<String> adaptador =
+                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
+
+        //Colocamos o adaptador na listview
+        ListView listView = (ListView) findViewById(R.id.listviewAddTags);
+        listView.setAdapter(adaptador);
+
 
 
         //Comportamento para salvar a checklist

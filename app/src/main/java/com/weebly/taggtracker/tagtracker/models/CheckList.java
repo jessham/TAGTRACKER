@@ -8,6 +8,7 @@ package com.weebly.taggtracker.tagtracker.models;
 
 public class CheckList  {
 
+    private String nomeTabela =  "checklists";
     private String Nome;
     private int Id;
 
@@ -16,6 +17,8 @@ public class CheckList  {
         this.Id=Id;
 
     }
+
+    public String getNomeTabela() { return nomeTabela; }
 
     public String getNome() {
         return Nome;
