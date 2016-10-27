@@ -90,7 +90,7 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                     txtTitulo.setText("");
                     return;
                 }
-                //Verifica se maior que 3  30 caracteres
+                //Verifica se maior que 3 e 30 caracteres
                 if (txtTitulo.getText().length() < 3 || txtTitulo.getText().length() > 30) {
                     txtTitulo.setError("O título deve ter entre 3 e 30 caracteres!");
                     txtTitulo.setText("");
@@ -99,22 +99,15 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                 //Verifica se existe checklist igual
                 ArrayList<String> listaTotal = bd.leChecklist();
 
-                /*
-
-                if (listaTotal.contains(txtTitulo.getText().toString())) {
-                    txtTitulo.setError("Já existe uma checklist com esse título!");
-                    txtTitulo.setText("");
-                    return;
-                } else if (!listaTotal.contains(txtTitulo.getText().toString())) {
-                    for (int i = 0; i < listaTotal.size(); i++) {
-                        if (verificaCaseSensitivity(listaTotal.get(i), listaTotal)) {
-                            txtTitulo.setError("Já existe uma checklist com esse título!");
-                            txtTitulo.setText("");
-                            return;
-                        }
+                for (int i = 0; i < listaTotal.size(); i++) {
+                    if (listaTotal.get(i).toLowerCase().contains(txtTitulo.getText().toString().toLowerCase())) {
+                        txtTitulo.setError("Já existe uma checklist com esse título!");
+                        txtTitulo.setText("");
+                        return;
                     }
                 }
-                */
+
+
 
                 //Verifica se não há item selecionado
                 if (itensSelecionados == ""){
