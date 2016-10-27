@@ -99,19 +99,22 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                 //Verifica se existe checklist igual
                 ArrayList<String> listaTotal = bd.leChecklist();
 
-                if (!listaTotal.contains(txtTitulo.getText().toString()))
+                /*
+
+                if (listaTotal.contains(txtTitulo.getText().toString())) {
+                    txtTitulo.setError("Já existe uma checklist com esse título!");
+                    txtTitulo.setText("");
+                    return;
+                } else if (!listaTotal.contains(txtTitulo.getText().toString())) {
                     for (int i = 0; i < listaTotal.size(); i++) {
-                        if (verificaCaseSensitivity(listaTotal.get(i), listaTotal)){
+                        if (verificaCaseSensitivity(listaTotal.get(i), listaTotal)) {
                             txtTitulo.setError("Já existe uma checklist com esse título!");
                             txtTitulo.setText("");
                             return;
                         }
                     }
-                else {
-                    txtTitulo.setError("Já existe uma checklist com esse título!");
-                    txtTitulo.setText("");
-                    return;
                 }
+                */
 
                 //Verifica se não há item selecionado
                 if (itensSelecionados == ""){
