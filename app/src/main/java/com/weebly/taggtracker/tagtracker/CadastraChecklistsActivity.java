@@ -137,11 +137,5 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
         });
     }
 
-    public boolean verificaCaseSensitivity(String palavra, ArrayList<String> lista){
-        for (String string : lista)
-            if (string.equalsIgnoreCase(palavra))
-                return true;
-        return false;
-    }
 
 }
