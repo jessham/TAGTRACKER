@@ -46,7 +46,9 @@
             android:layout_width="match_parent"
             android:layout_height="256dp"
             android:id="@+id/listviewAddTags"
-            android:layout_marginBottom="30dp" />
+            android:layout_marginBottom="30dp"
+            android:layout_centerHorizontal="true"
+            android:choiceMode="multipleChoice"/>
 
         <Space
             android:layout_width="match_parent"

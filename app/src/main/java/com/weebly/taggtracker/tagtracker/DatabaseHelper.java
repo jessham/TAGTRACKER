@@ -158,6 +158,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+
+
+
     //LEITURA
     public ArrayList<String> leChecklist(){
         SQLiteDatabase db = this.getReadableDatabase();

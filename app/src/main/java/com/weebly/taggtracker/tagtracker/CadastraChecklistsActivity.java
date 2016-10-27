@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -28,6 +29,8 @@ import java.util.ArrayList;
 public class CadastraChecklistsActivity extends AppCompatActivity {
     DatabaseHelper bd;
     MultiAutoCompleteTextView autocompleta;
+    SparseBooleanArray sparseBooleanArray ;
+    String itensSelecionados = "" ;
 
 
 
@@ -43,13 +46,33 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
 
 
         //Criamos o array de dados e o colocamos no adapter
-        ArrayList array = bd.leTags();
+        final ArrayList array = bd.leTags();
         final ArrayAdapter<String> adaptador =
-                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
+                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, array);
 
         //Colocamos o adaptador na listview
-        ListView listView = (ListView) findViewById(R.id.listviewAddTags);
+        final ListView listView = (ListView) findViewById(R.id.listviewAddTags);
         listView.setAdapter(adaptador);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO Auto-generated method stub
+                sparseBooleanArray = listView.getCheckedItemPositions();
+                itensSelecionados = "";
+
+
+                int i = 0 ;
+                while (i < sparseBooleanArray.size()) {
+                    if (sparseBooleanArray.valueAt(i))
+                        itensSelecionados += array.toArray() [ sparseBooleanArray.keyAt(i) ] + ",";
+                    i++ ;
+                }
+
+                Toast.makeText(getApplicationContext(), "Selecionados: " + itensSelecionados, Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
 
@@ -89,6 +112,15 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                     txtTitulo.setText("");
                     return;
                 }
+
+                //Verifica se não há item selecionado
+                if (itensSelecionados == ""){
+                    Toast.makeText(getApplicationContext(), "Selecione alguma tag!", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+
+
 
                 if (bd.insereChecklist(txtTitulo.getText().toString())) {
                     //Intent returnIntent = new Intent();
