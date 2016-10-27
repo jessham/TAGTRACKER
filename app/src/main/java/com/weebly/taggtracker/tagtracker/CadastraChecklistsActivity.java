@@ -107,8 +107,6 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                     }
                 }
 
-
-
                 //Verifica se não há item selecionado
                 if (itensSelecionados == ""){
                     Toast.makeText(getApplicationContext(), "Selecione alguma tag!", Toast.LENGTH_LONG).show();
