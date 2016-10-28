@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 //Boa referencia aqui: http://www.vogella.com/tutorials/AndroidListView/article.html
@@ -59,7 +61,19 @@ public class TelaChecklistActivity extends ListFragment {
     //Faz alguma coisa quando o item é clicado: MELHORAR!!
     public void onListItemClick(ListView l, View v, int position, long id) {
         // TODO implement some logic
-        Toast.makeText(getActivity(), "Item: " + l.getItemAtPosition(position), Toast.LENGTH_SHORT)
+        //Encontra a id da checklist selecionada
+        String item = l.getItemAtPosition(position).toString();
+        int checklist = bd.buscaIdChecklist(item);
+
+        //Econtra as tags relacionadas a essa checklist
+        ArrayList<String> lista = bd.leItensListas(Integer.toString(checklist));
+
+        String mensagem = "";
+        if (lista.isEmpty()) mensagem = "VAZIO";
+        else mensagem = lista.toString();
+
+
+        Toast.makeText(getActivity(), "Contém: " + lista.toString(), Toast.LENGTH_SHORT)
                 .show();
     }
 }

@@ -24,6 +24,9 @@
             android:id="@+id/nav_premium"
             android:icon="@drawable/ic_menu_manage"
             android:title="TAGTRACKER Premium" />
+
+        <item android:title="Item"
+            android:id="@+id/nav_testes" />
     </group>
 
 </menu>

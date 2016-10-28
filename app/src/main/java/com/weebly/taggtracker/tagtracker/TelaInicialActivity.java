@@ -268,6 +268,10 @@ public class TelaInicialActivity extends AppCompatActivity
             // Ir para a tela sobre a versao premium
             Intent intent = new Intent(this, PremiumActivity.class);
             startActivity(intent);
+        } else if (id == R.id.nav_testes) {
+            // Ir para a tela sobre a versao premium
+            Intent intent = new Intent(this, AlgunsTestes.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -289,5 +293,4 @@ public class TelaInicialActivity extends AppCompatActivity
 
 
 }
-
 

@@ -8,7 +8,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.sql.DriverManager.println;
 
 /**
  * Created by Barbara on 23/10/2016.
@@ -89,10 +94,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-
     //INSERÇÃO
+    public boolean insereGeral (String titulo, String rotulo){
+        //insere o titulo da checklist
+
+        if (!insereChecklist(titulo)) return false;
+
+        //pega o id da checklist recém-criada
+        int idchecklist = buscaIdChecklist(titulo);
+        if (idchecklist == -1) return false;
+
+
+
+        /*depois retorna o id das tags selecionadas*/
+        List<String> lista = Arrays.asList(rotulo.split(","));
+
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < lista.size(); i++){
+            String a = lista.get(i);
+            //Toast.makeText(contexto,"PROCURA ITEM '" + a + "'",Toast.LENGTH_LONG).show();
+            int ab = buscaIdTag(a);
+            if (ab < 0 ) return false;
+            else list.add(ab);
+            if (list.get(i) == -1) return false;
+        }
+
+
+        //Finalmente, insere na tabela associa
+        for (int i = 0; i < lista.size(); i++){
+            if (!insereAssocia(idchecklist, list.get(i)))
+                return false;
+        }
+        return true;
+    }
+
     public boolean insereChecklist(String titulo) {
+    /* primeiro insere o titulo da checklist */
+
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try {
@@ -108,12 +146,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     null,
                     values);
             db.close();
-            Toast.makeText(contexto, R.string.checklist_inserted,Toast.LENGTH_LONG).show();
         } catch (Exception e){
-            Toast.makeText(contexto, R.string.checklist_notinserted,Toast.LENGTH_LONG).show();
+            Toast.makeText(contexto, e.getMessage(),Toast.LENGTH_SHORT).show();
             return false;
         }
-        return true;
+       return true;
     }
 
     public boolean insereTags(String titulo) {
@@ -139,9 +176,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public void insereAssocia(int idChecklists, int idTags) {
-        try {
+    public boolean insereAssocia(int idChecklists, int idTags) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        try {
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
             values.put(tabelaAssocia.checklistsID, idChecklists);
@@ -149,16 +188,65 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Insert the new row, returning the primary key value of the new row
             long newRowId;
-            newRowId = getWritableDatabase().insert(
+            newRowId = db.insert(
                     tabelaAssocia.nomeTabela,
                     null,
                     values);
+            db.close();
+            Toast.makeText(contexto, R.string.checklist_inserted,Toast.LENGTH_SHORT).show();
         }  catch (Exception e){
-            Toast.makeText(contexto,"ERROR" + e.getMessage(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(contexto, R.string.checklist_notinserted,Toast.LENGTH_SHORT).show();
+            return false;
         }
+        return true;
     }
 
+    public int buscaIdTag(String rotulo){
+        SQLiteDatabase db = this.getReadableDatabase();
+        int resp = -1;
 
+        try {
+            Cursor cursor = db.rawQuery("select " + tabelaTags.colunaID +
+                    " from " + tabelaTags.nomeTabela + " where " +
+                    tabelaTags.colunaTitulo + " = ?", new String[] {rotulo});
+
+            String temp = "";
+            if (cursor.moveToFirst()){
+                temp = cursor.getString(cursor.getColumnIndex(tabelaTags.colunaID));
+            }
+            if (temp != "") resp = Integer.parseInt(temp);
+
+            cursor.close();
+            db.close();
+            //Toast.makeText(contexto,"BUSCA TAG ID ()" + resp,Toast.LENGTH_LONG).show();
+        }  catch (Exception e){
+            Toast.makeText(contexto,e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+        return resp;
+    }
+
+    public int buscaIdChecklist(String titulo){
+        SQLiteDatabase db = this.getReadableDatabase();
+        int resp = -1;
+
+        try {
+            Cursor cursor = db.rawQuery("select " + tabelaChecklists.colunaID +
+                    " from " + tabelaChecklists.nomeTabela + " where " +
+                    tabelaChecklists.colunaTitulo + " = ?" , new String[]  {titulo});
+
+            String temp = "";
+            if (cursor.moveToFirst()){
+                temp = cursor.getString(cursor.getColumnIndex(tabelaChecklists.colunaID));
+            }
+            if (temp != "") resp = Integer.parseInt(temp);
+            cursor.close();
+            db.close();
+            //Toast.makeText(contexto,"BUSCA CH ID ()" + resp,Toast.LENGTH_SHORT).show();
+        }  catch (Exception e){
+            Toast.makeText(contexto,"BUSCA CH ID " + e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+        return resp;
+    }
 
 
     //LEITURA
@@ -214,8 +302,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             Cursor cursor = getReadableDatabase().rawQuery(" select " + tabelaTags.colunaTitulo + " from " + tabelaTags.nomeTabela +
                     " where " + tabelaTags.colunaID + " in ( select " + tabelaAssocia.tagsID +
-                    " from " + tabelaAssocia.nomeTabela + " as a  where " + tabelaAssocia.checklistsID + " = " +
-                    idChecklist, null);
+                    " from " + tabelaAssocia.nomeTabela + " where " + tabelaAssocia.checklistsID + " = ? )", new String[] {idChecklist});
 
             if (cursor.moveToFirst()) {
                 do {
@@ -225,8 +312,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
             cursor.close();
         }  catch (Exception e){
-            Toast.makeText(contexto,"ERROR" + e.getMessage(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(contexto,"ERROR" + e.getMessage(),Toast.LENGTH_LONG).show();
         }
+        return resp;
+    }
+
+    public ArrayList<String> leAssocia(){
+        ArrayList<String> resp = new ArrayList<String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        try {
+            Cursor cursor = db.rawQuery("select * from " + tabelaAssocia.nomeTabela, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    String linea = cursor.getString(0);
+                    resp.add(linea);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e){
+            Toast.makeText(contexto,R.string.erro_exibirTags,Toast.LENGTH_SHORT).show();
+        }
+
         return resp;
     }
 

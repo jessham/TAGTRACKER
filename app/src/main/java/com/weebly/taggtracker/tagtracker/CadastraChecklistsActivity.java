@@ -62,15 +62,13 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                 sparseBooleanArray = listView.getCheckedItemPositions();
                 itensSelecionados = "";
 
-
                 int i = 0 ;
                 while (i < sparseBooleanArray.size()) {
-                    if (sparseBooleanArray.valueAt(i))
-                        itensSelecionados += array.toArray() [ sparseBooleanArray.keyAt(i) ] + ",";
-                    i++ ;
+                    if (sparseBooleanArray.valueAt(i)) {
+                        itensSelecionados += array.toArray()[sparseBooleanArray.keyAt(i)] + ",";
+                    }
+                     i++ ;
                 }
-
-                Toast.makeText(getApplicationContext(), "Selecionados: " + itensSelecionados, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -113,15 +111,15 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
                     return;
                 }
 
-
-
-
-                if (bd.insereChecklist(txtTitulo.getText().toString())) {
+                if (bd.insereGeral(txtTitulo.getText().toString(), itensSelecionados)) {
                     //Intent returnIntent = new Intent();
                     setResult(Activity.RESULT_OK, getIntent());
                     finish();
                 }
                 txtTitulo.setText("");
+
+
+                limpaListView(listView);
             }
         });
 
@@ -135,5 +133,18 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
         });
     }
 
+
+    public void limpaListView(ListView l){
+        sparseBooleanArray = l.getCheckedItemPositions();
+        itensSelecionados = "";
+
+        int i = 0 ;
+        while (i < sparseBooleanArray.size()) {
+            if (sparseBooleanArray.valueAt(i)) {
+                l.setItemChecked(i, false);
+            }
+            i++ ;
+        }
+    }
 
 }
