@@ -55,8 +55,26 @@
             android:name=".AlgunsTestes"
             android:label="@string/title_activity_alguns_testes"
             android:theme="@style/AppTheme"></activity>
-        <activity android:name=".CadastraTagsActivity" />
-        <activity android:name=".CadastraChecklistsActivity" />
+
+        <activity
+            android:name=".CadastraTagsActivity"
+            android:parentActivityName="com.weebly.taggtracker.tagtracker.TelaInicialActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.weebly.taggtracker.tagtracker.TelaInicialActivity" />
+        </activity>
+
+        <activity
+            android:name=".CadastraChecklistsActivity"
+            android:parentActivityName="com.weebly.taggtracker.tagtracker.TelaInicialActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.weebly.taggtracker.tagtracker.TelaInicialActivity" />
+        </activity>
         <!--
  ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.

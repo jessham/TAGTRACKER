@@ -3,14 +3,15 @@ package com.weebly.taggtracker.tagtracker;
 import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class CadastraTagsActivity extends AppCompatActivity {
     DatabaseHelper bd;
+    Toolbar toolbar;
 
     public CadastraTagsActivity() {
         bd = new DatabaseHelper(this);
@@ -20,6 +21,15 @@ public class CadastraTagsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastra_tags);
+
+        //Coloca a toolbar que permite voltar
+        toolbar = (Toolbar) findViewById(R.id.toolbar_cadastrachecklist);
+        toolbar.getMenu().getItem(R.id.app_bar_delete).setVisible(false);
+        toolbar.getMenu().getItem(R.id.app_bar_search).setVisible(false);
+        toolbar.setTitle(R.string.title_CadastraTagsActivity);
+        setSupportActionBar(toolbar);
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Comportamento para salvar a tag
         View btnSalvar = findViewById(R.id.btnSalvarTag);

@@ -19,18 +19,11 @@
             android:paddingTop="@dimen/appbar_padding_top"
             android:theme="@style/AppTheme.AppBarOverlay">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <include
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                android:contextClickable="false"
-                app:logoDescription="TAGTRACKER"
-                app:title="TAGTRACKER">
-
-            </android.support.v7.widget.Toolbar>
+                android:layout_height="wrap_content"
+                layout="@layout/tool_bar"
+                android:id="@+id/toolbar_cadastrachecklist" />
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"

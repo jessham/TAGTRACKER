@@ -1,28 +1,17 @@
 package com.weebly.taggtracker.tagtracker;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseBooleanArray;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.Toast;
-
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.weebly.taggtracker.tagtracker.models.CheckList;
 
 import java.util.ArrayList;
 
@@ -31,6 +20,7 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
     MultiAutoCompleteTextView autocompleta;
     SparseBooleanArray sparseBooleanArray ;
     String itensSelecionados = "" ;
+    Toolbar toolbar;
 
 
 
@@ -43,6 +33,13 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastra_checklists);
+
+
+        //Configura a toolbar
+        Toolbar appbar = (Toolbar) findViewById(R.id.toolbar_cadastrachecklist);
+        setSupportActionBar(appbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
 
         //Criamos o array de dados e o colocamos no adapter
@@ -146,5 +143,7 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
             i++ ;
         }
     }
+
+
 
 }

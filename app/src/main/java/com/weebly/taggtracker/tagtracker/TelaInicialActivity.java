@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -37,24 +38,26 @@ public class TelaInicialActivity extends AppCompatActivity
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private TelaChecklistActivity telaC;
+    private Toolbar toolbar;
 
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        viewPager.setCurrentItem(tab.getPosition());
+    public Toolbar getToolbar() {
+        return toolbar;
     }
 
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {    }
+    public void setToolbar(Toolbar toolbar) {
+        this.toolbar = toolbar;
+    }
 
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tela_inicial);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar_cadastrachecklist);
         setSupportActionBar(toolbar);
+
 
         bdhelper = new DatabaseHelper(this);
         bdhelper.getWritableDatabase();
@@ -86,6 +89,13 @@ public class TelaInicialActivity extends AppCompatActivity
     }
 
 
+
+
+
+    /* ********************************************************************************************
+        MÉTODOS DA TAB
+     ******************************************************************************************** */
+
     public void arrumaTabs(){
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -108,7 +118,26 @@ public class TelaInicialActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        viewPager.setCurrentItem(tab.getPosition());
+    }
 
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {    }
+
+
+
+
+
+
+    /* ********************************************************************************************
+        MÉTODOS DO BOTÃO FAB
+     ******************************************************************************************** */
+    //Gerencia o comportamento do botao fab
     public void abreMenu(final View _view){
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -172,7 +201,7 @@ public class TelaInicialActivity extends AppCompatActivity
 
     }
 
-    //CARREGA AS TELAS DE ADD AS COISAS AQUI
+    //Abre a tela de cadastra checklist
     public void carregaAddChecklists(){
         // Toast.makeText(this, "Carrega a tela de add as checklist", Toast.LENGTH_LONG).show();
         CadastraChecklistsActivity cadastra = new CadastraChecklistsActivity();
@@ -181,12 +210,33 @@ public class TelaInicialActivity extends AppCompatActivity
 
     }
 
+    //Abre a tela de cadastra tag
     public void carregaAddTags(){
         CadastraTagsActivity ct = new CadastraTagsActivity();
         Intent it = new Intent(TelaInicialActivity.this, ct.getClass());
         startActivityForResult(it, 2);
     }
 
+    //Retorna o resultado das telas abertas
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //Caso insere checklists ou tags, atualiza a exibição das tabs
+        if (requestCode == 1 || requestCode == 2) {
+            if(resultCode == Activity.RESULT_OK){
+                arrumaTabs();
+            }
+        }
+    }
+
+
+
+
+
+
+    /* ********************************************************************************************
+        MÉTODOS DO NFC
+     ******************************************************************************************** */
     //VERIFICA NFC AQUI
     public boolean verificaNFC(View view){
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -209,6 +259,79 @@ public class TelaInicialActivity extends AppCompatActivity
         }
     }
 
+
+
+
+
+
+
+    /* ********************************************************************************************
+        MÉTODOS DA TOOLBAR
+     ******************************************************************************************** */
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.menu_toolbar, menu);
+        apareceMenu(true, false);
+        return (super.onCreateOptionsMenu(menu));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.app_bar_search:
+                pesquisa();
+                return true;
+
+            case R.id.app_bar_delete:
+                deleta();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    //Configura as opções visiveis do menu da toolbar
+    public void apareceMenu(boolean pesquisa, boolean deleta){
+        getToolbar().getMenu().findItem(R.id.app_bar_delete).setVisible(deleta);
+        getToolbar().getMenu().findItem(R.id.app_bar_search).setVisible(pesquisa);
+    }
+
+    //Faz a pesquisa dos itens
+    public void pesquisa(){
+
+    }
+
+    //Faz a deleção dos itens
+    public void deleta(){
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* ********************************************************************************************
+        MÉTODOS DE NAVEGAÇÃO
+     ******************************************************************************************** */
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -219,28 +342,6 @@ public class TelaInicialActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // Esta funcao adiciona "..." na barra no canto superior direito
-        //getMenuInflater().inflate(R.menu.TelaInicialActivity, menu);
-        return false;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -279,16 +380,8 @@ public class TelaInicialActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        //Caso insere checklists ou tags, atualiza a exibição das tabs
-        if (requestCode == 1 || requestCode == 2) {
-            if(resultCode == Activity.RESULT_OK){
-                arrumaTabs();
-            }
-        }
-    }
+
 
 
 
