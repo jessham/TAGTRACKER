@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
@@ -24,6 +25,7 @@ public class TelaTagsActivity extends ListFragment {
     View v;
     boolean isChecked = false;
     private Toolbar toolbar;
+    private boolean ativaModoSelecao;
 
     public ArrayAdapter<String> getAdapter(){
         return this.adapter;
@@ -77,29 +79,50 @@ public class TelaTagsActivity extends ListFragment {
 
         adapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_1, values);
-
         adapter.notifyDataSetChanged();
-
-
         setListAdapter(adapter);
+
+        //comportamento para qndo o usuario pressionar por um longo tempo
+        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                ativaModoSelecao = true;
+
+                //Ajusta a lista de itens selecionados
+                if (!selecionados.contains(position)) {
+                    selecionados.add(position);
+                    view.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                } else {
+                    int pos = selecionados.indexOf(position);
+                    selecionados.remove(pos);
+                    view.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+                }
+
+                //As ações da toolbar dependem desse resultado
+                configuraToolbar();
+                return true;
+            }
+        } );
     }
 
     @Override
     //Faz alguma coisa quando o item é clicado: MELHORAR!!
     public void onListItemClick(ListView l, View v, int position, long id) {
-        // TODO implement some logic
-        //Ajusta a lista de itens selecionados
-        if (!selecionados.contains(position)) {
-            selecionados.add(position);
-            v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-        } else {
-            int pos = selecionados.indexOf(position);
-            selecionados.remove(pos);
-            v.setBackgroundColor(getResources().getColor(android.R.color.background_light));
-        }
+        //se estiver no modo seleção
+        if(ativaModoSelecao) {
+            //Ajusta a lista de itens selecionados
+            if (!selecionados.contains(position)) {
+                selecionados.add(position);
+                v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+            } else {
+                int pos = selecionados.indexOf(position);
+                selecionados.remove(pos);
+                v.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+            }
 
-        //As ações da toolbar dependem desse resultado
-        configuraToolbar();
+            //As ações da toolbar dependem desse resultado
+            configuraToolbar();
+        }
 
         Toast.makeText(getActivity(), "Item: " + l.getItemAtPosition(position), Toast.LENGTH_SHORT)
                 .show();
@@ -122,6 +145,7 @@ public class TelaTagsActivity extends ListFragment {
         else {
             item.setVisible(false);
             checkbox.setVisibility(View.INVISIBLE);
+            ativaModoSelecao = false;
         }
 
 

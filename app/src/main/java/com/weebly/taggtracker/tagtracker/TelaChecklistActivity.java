@@ -34,6 +34,7 @@ public class TelaChecklistActivity extends ListFragment {
     View v;
     boolean isChecked = false;
     private Toolbar toolbar;
+    private boolean ativaModoSelecao;
 
 
     public void instanciaBD(DatabaseHelper bd){
@@ -89,8 +90,21 @@ public class TelaChecklistActivity extends ListFragment {
         //comportamento para qndo o usuario pressionar por um longo tempo
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                Toast.makeText(getActivity(), "On long click listener", Toast.LENGTH_LONG).show();
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                ativaModoSelecao = true;
+
+                //Ajusta a lista de itens selecionados
+                if (!selecionados.contains(position)) {
+                    selecionados.add(position);
+                    view.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                } else {
+                    int pos = selecionados.indexOf(position);
+                    selecionados.remove(pos);
+                    view.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+                }
+
+                //As ações da toolbar dependem desse resultado
+                configuraToolbar();
                 return true;
             }
         } );
@@ -101,23 +115,27 @@ public class TelaChecklistActivity extends ListFragment {
     @Override
     //Faz alguma coisa quando o item é clicado: MELHORAR!!
     public void onListItemClick(ListView l, View v, int position, long id) {
-        // TODO implement some logic
+        //se estiver no modo seleção
+        if(ativaModoSelecao){
+            //Ajusta a lista de itens selecionados
+            if (!selecionados.contains(position)) {
+                selecionados.add(position);
+                v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+            } else {
+                int pos = selecionados.indexOf(position);
+                selecionados.remove(pos);
+                v.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+            }
+
+            //As ações da toolbar dependem desse resultado
+            configuraToolbar();
+        }
+
+
+
         //Encontra a id da checklist selecionada
         String item = l.getItemAtPosition(position).toString();
         int checklist = bd.buscaIdChecklist(item);
-
-        //Ajusta a lista de itens selecionados
-        if (!selecionados.contains(position)) {
-            selecionados.add(position);
-            v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-        } else {
-            int pos = selecionados.indexOf(position);
-            selecionados.remove(pos);
-            v.setBackgroundColor(getResources().getColor(android.R.color.background_light));
-        }
-
-        //As ações da toolbar dependem desse resultado
-        configuraToolbar();
 
         //Econtra as tags relacionadas a essa checklist
         ArrayList<String> lista = bd.leItensListas(Integer.toString(checklist));
@@ -140,6 +158,7 @@ public class TelaChecklistActivity extends ListFragment {
         else {
             item.setVisible(false);
             checkbox.setVisibility(View.INVISIBLE);
+            ativaModoSelecao = false;
         }
 
 
