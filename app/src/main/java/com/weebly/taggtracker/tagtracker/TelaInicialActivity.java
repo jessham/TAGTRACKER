@@ -2,12 +2,14 @@ package com.weebly.taggtracker.tagtracker;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.MenuInflater;
 import android.view.View;
@@ -38,15 +40,13 @@ public class TelaInicialActivity extends AppCompatActivity
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private TelaChecklistActivity telaC;
+    private TelaTagsActivity telaT;
     private Toolbar toolbar;
+    private Pager adapter = new Pager(getSupportFragmentManager());
+    boolean tabCheck;
 
-    public Toolbar getToolbar() {
-        return toolbar;
-    }
 
-    public void setToolbar(Toolbar toolbar) {
-        this.toolbar = toolbar;
-    }
+
 
 
 
@@ -103,14 +103,16 @@ public class TelaInicialActivity extends AppCompatActivity
 
 
         viewPager = (ViewPager) findViewById(R.id.pager);
-        Pager adapter = new Pager(getSupportFragmentManager());
+
 
         telaC = new TelaChecklistActivity();
         telaC.instanciaBD(bdhelper);
+        telaC.setToolbar(toolbar);
         adapter.addFragment(telaC, "CHECKLISTS", false);
 
-        TelaTagsActivity telaT = new TelaTagsActivity();
+        telaT = new TelaTagsActivity();
         telaT.instanciaBD(bdhelper);
+        telaT.setToolbar(toolbar);
         adapter.addFragment(telaT, "TAGS", false);
 
         viewPager.setAdapter(adapter);
@@ -141,18 +143,6 @@ public class TelaInicialActivity extends AppCompatActivity
     public void abreMenu(final View _view){
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-/*
-        if (menuExpandido == true){
-            menuExpandido = false;
-            fab.setImageResource(ic_input_add);
-            dialog.dismiss();
-            return;
-
-        } else {
-            menuExpandido = true;
-            fab.setImageResource(ic_menu_close_clear_cancel);
-        }
-*/
         dialog = new Dialog(TelaInicialActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.menu_fab);
@@ -290,6 +280,8 @@ public class TelaInicialActivity extends AppCompatActivity
 
             case R.id.app_bar_delete:
                 deleta();
+                telaC.deselecionaTudo();
+                telaT.deselecionaTudo();
                 return true;
 
             default:
@@ -313,7 +305,45 @@ public class TelaInicialActivity extends AppCompatActivity
 
     //Faz a deleção dos itens
     public void deleta(){
+        if (tabLayout.getSelectedTabPosition() == tabLayout.getTabAt(0).getPosition()) tabCheck = true;
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Remoção");
+        builder.setMessage("Tem certeza que quer remover esses itens?");
+
+        builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (tabCheck){
+                    //Fazer metodo para deletar tanto da checklist qnto da tag
+
+                } else {
+
+                }
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
+    //Getter e setter da toolbar
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    public void setToolbar(Toolbar toolbar) {
+        this.toolbar = toolbar;
     }
 
 

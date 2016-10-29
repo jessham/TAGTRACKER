@@ -20,10 +20,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
 
         <RelativeLayout
             android:id="@+id/activity_cadastra_checklists"
@@ -74,7 +70,8 @@
                     android:layout_marginBottom="30dp"
                     android:layout_centerHorizontal="true"
                     android:choiceMode="multipleChoice"
-                    android:scrollbars="horizontal|vertical"
+                    android:scrollbars="vertical"
+                    android:fadeScrollbars="false"
                     android:soundEffectsEnabled="true" />
 
                 <Space
@@ -105,5 +102,4 @@
             </LinearLayout>
 
         </RelativeLayout>
-    </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

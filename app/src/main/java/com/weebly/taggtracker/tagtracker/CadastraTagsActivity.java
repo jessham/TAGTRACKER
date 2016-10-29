@@ -22,14 +22,7 @@ public class CadastraTagsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastra_tags);
 
-        //Coloca a toolbar que permite voltar
-        toolbar = (Toolbar) findViewById(R.id.toolbar_cadastrachecklist);
-        toolbar.getMenu().getItem(R.id.app_bar_delete).setVisible(false);
-        toolbar.getMenu().getItem(R.id.app_bar_search).setVisible(false);
-        toolbar.setTitle(R.string.title_CadastraTagsActivity);
-        setSupportActionBar(toolbar);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Comportamento para salvar a tag
         View btnSalvar = findViewById(R.id.btnSalvarTag);
