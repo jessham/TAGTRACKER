@@ -25,16 +25,30 @@
     <string name="tag_notinserted">Erro ao inserir a tag</string>
     <string name="checklist_inserted">A checklist foi inserida com sucesso</string>
     <string name="checklist_notinserted">Erro ao inserir a checklist</string>
+    <string name="msg_deleteChecklist">Tem certeza que deseja excluir essas checklists?</string>
+    <string name="msg_deleteTag">Tem certeza que deseja excluir essas tags?</string>
+    <string name="delete_title">Remoção</string>
+
+    <!-- BOTÕES -->
+    <string name="btnYes">Sim</string>
+    <string name="btnNo">Não</string>
 
 
     <!-- ERROS -->
     <string name="erro_exibirTags">Erro ao exibir as tags</string>
-    <string name="erro_exibirChecklist">Erro ao exibit as checklists</string>
+    <string name="erro_exibirChecklist">Erro ao exibir as checklists</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_alguns_testes">AlgunsTestes</string>
+    <string name="erro_leItens">Erro na leitura da checklist</string>
 
     <!-- TOOLBAR -->
     <string name="back_arrow_description">Voltar</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!--TITULOS-->
+    <string name="tab_checklist">Checklists</string>
+    <string name="tab_tag">Tags</string>
 </resources>

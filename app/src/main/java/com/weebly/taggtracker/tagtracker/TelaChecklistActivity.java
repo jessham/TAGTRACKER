@@ -17,11 +17,7 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-
-//Boa referencia aqui: http://www.vogella.com/tutorials/AndroidListView/article.html
-//Outro: http://www.tutorialsbuzz.com/2014/05/android-listfragment-using-arrayadapter.html
 
 public class TelaChecklistActivity extends ListFragment {
     private DatabaseHelper bd;
@@ -30,21 +26,17 @@ public class TelaChecklistActivity extends ListFragment {
     public ArrayAdapter<String> getAdapter(){
         return this.adapter;
     }
-    CheckBox checkbox;
-    View v;
+    private CheckBox checkbox;
+    private View v;
+    private ListView listview;
     boolean isChecked = false;
     private Toolbar toolbar;
     private boolean ativaModoSelecao;
 
 
-    public void instanciaBD(DatabaseHelper bd){
-        this.bd = bd;
-    }
-
-    public void atualizaAdapter(){
-        this.adapter.notifyDataSetChanged();
-    }
-
+    /* ********************************************************************************************
+     * METODOS DE CRIAÇÃO DA LISTFRAGMENT
+     * *******************************************************************************************/
 
     @Override
     //Coloca a view do xml definido: tela_checklists
@@ -68,7 +60,6 @@ public class TelaChecklistActivity extends ListFragment {
                     checkbox.setChecked(isChecked);
                     deselecionaTudo();
                 }
-
             }
         });
 
@@ -79,11 +70,10 @@ public class TelaChecklistActivity extends ListFragment {
     //Coloca os dados dp BD no adapter
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        listview = getListView();
 
-        //pega os dados das checklists
-        ArrayList<String> values = bd.leChecklist();
-        adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, values);
+        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, bd.leChecklist());
+
         setListAdapter(adapter);
 
 
@@ -96,11 +86,11 @@ public class TelaChecklistActivity extends ListFragment {
                 //Ajusta a lista de itens selecionados
                 if (!selecionados.contains(position)) {
                     selecionados.add(position);
-                    view.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    view.setBackgroundColor(getResources().getColor(R.color.itemSelecionado));
                 } else {
                     int pos = selecionados.indexOf(position);
                     selecionados.remove(pos);
-                    view.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+                    view.setBackgroundColor(getResources().getColor(R.color.itemNormal));
                 }
 
                 //As ações da toolbar dependem desse resultado
@@ -108,8 +98,6 @@ public class TelaChecklistActivity extends ListFragment {
                 return true;
             }
         } );
-
-
     }
 
     @Override
@@ -120,28 +108,76 @@ public class TelaChecklistActivity extends ListFragment {
             //Ajusta a lista de itens selecionados
             if (!selecionados.contains(position)) {
                 selecionados.add(position);
-                v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                v.setBackgroundColor(getResources().getColor(R.color.itemSelecionado));
             } else {
                 int pos = selecionados.indexOf(position);
                 selecionados.remove(pos);
-                v.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+                v.setBackgroundColor(getResources().getColor(R.color.itemNormal));
             }
 
             //As ações da toolbar dependem desse resultado
             configuraToolbar();
         }
-
-
-
         //Encontra a id da checklist selecionada
         String item = l.getItemAtPosition(position).toString();
         int checklist = bd.buscaIdChecklist(item);
 
         //Econtra as tags relacionadas a essa checklist
         ArrayList<String> lista = bd.leItensListas(Integer.toString(checklist));
-        Toast.makeText(getActivity(), "Contém: " + lista.toString(), Toast.LENGTH_SHORT)
-                .show();
     }
+
+
+    /* *********************************************************************************************
+     * GETTERS E SETTERS
+     * ********************************************************************************************/
+
+    public void instanciaBD(DatabaseHelper bd){
+        this.bd = bd;
+    }
+
+    public void atualizaAdapter(){
+        Toast.makeText(getContext(), "Faz a atualizaConteudo", Toast.LENGTH_SHORT).show();
+        this.adapter.notifyDataSetChanged();
+    }
+
+    public ArrayList<Integer> getSelecionados() {
+        return selecionados;
+    }
+
+    public void setSelecionados(ArrayList<Integer> selecionados) {
+        this.selecionados = selecionados;
+
+
+    }
+
+    public ArrayList<String> getSelecionadosTitulos (){
+        ArrayList<String> resp = new ArrayList<String>();
+
+
+        for (int i = 0; i < selecionados.size(); i++){
+
+            int item = selecionados.get(i);
+            String titulo = listview.getItemAtPosition(item).toString();
+
+            resp.add(titulo);
+        }
+
+        return resp;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    public void setToolbar(Toolbar toolbar) {
+        this.toolbar = toolbar;
+    }
+
+
+
+    /* *********************************************************************************************
+     * TOOLBAR E SELEÇÃO
+     * ********************************************************************************************/
 
     public void configuraToolbar(){
         //Altera o título e altera ícones da toolbar
@@ -172,45 +208,28 @@ public class TelaChecklistActivity extends ListFragment {
         }
     }
 
-
-    public Toolbar getToolbar() {
-        return toolbar;
-    }
-
-    public void setToolbar(Toolbar toolbar) {
-        this.toolbar = toolbar;
-    }
-
-
-
     public void deselecionaTudo(){
-        ListView lista = getListView();
         selecionados.clear();
 
-        for (int i = 0; i < lista.getCount(); i ++) {
-            View item = getListView().getChildAt(i);
-            item.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+        for (int i = 0; i < listview.getCount(); i ++) {
+            View item = listview.getChildAt(i);
+            if (item != null)
+                item.setBackgroundColor(getResources().getColor(R.color.itemNormal));
         }
-
         configuraToolbar();
     }
 
     public void selecionaTudo(){
         selecionados.clear();
-        ListView lista = getListView();
 
-        for (int i = 0; i < lista.getCount(); i ++) {
+        for (int i = 0; i < listview.getCount(); i ++) {
             selecionados.add(i);
-            View item = getListView().getChildAt(i);
-            item.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+            View item = listview.getChildAt(i);
+            if (item != null)
+                item.setBackgroundColor(getResources().getColor(R.color.itemSelecionado));
         }
-
         configuraToolbar();
     }
-
-
-
-
 }
 
 

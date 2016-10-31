@@ -28,6 +28,14 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
         bd = new DatabaseHelper(this);
     }
 
+    public String getItensSelecionados() {
+        return itensSelecionados;
+    }
+
+    public void setItensSelecionados(String itensSelecionados) {
+        this.itensSelecionados = itensSelecionados;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

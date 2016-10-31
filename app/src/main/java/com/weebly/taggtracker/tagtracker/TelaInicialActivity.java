@@ -28,6 +28,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TelaInicialActivity extends AppCompatActivity
@@ -42,13 +44,20 @@ public class TelaInicialActivity extends AppCompatActivity
     private TelaChecklistActivity telaC;
     private TelaTagsActivity telaT;
     private Toolbar toolbar;
-    private Pager adapter = new Pager(getSupportFragmentManager());
+    private Pager adapter;
     boolean tabCheck;
+    private boolean sucessoDeletar;
 
 
+    public boolean isSucessoDeletar() {
+        return sucessoDeletar;
+    }
 
-
-
+    public void setSucessoDeletar(boolean sucessoDeletar) {
+        this.sucessoDeletar = sucessoDeletar;
+        //atualiza
+        atualizaConteudo();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,37 +100,87 @@ public class TelaInicialActivity extends AppCompatActivity
 
 
 
-
     /* ********************************************************************************************
         MÉTODOS DA TAB
      ******************************************************************************************** */
 
     public void arrumaTabs(){
-
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
-
-        viewPager = (ViewPager) findViewById(R.id.pager);
-
 
         telaC = new TelaChecklistActivity();
         telaC.instanciaBD(bdhelper);
         telaC.setToolbar(toolbar);
-        adapter.addFragment(telaC, "CHECKLISTS", false);
+
 
         telaT = new TelaTagsActivity();
         telaT.instanciaBD(bdhelper);
         telaT.setToolbar(toolbar);
-        adapter.addFragment(telaT, "TAGS", false);
 
+        atualizaAdapter();
+    }
+
+    public void atualizaAdapter(){
+        adapter = new Pager(getSupportFragmentManager());
+        adapter.addFragment(telaC, getResources().getString(R.string.tab_checklist), false);
+        adapter.addFragment(telaT, getResources().getString(R.string.tab_tag), false);
+
+        adapter.getItem(0).getTag();
+        viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        if (getTab() == 1) setTab(1);
+
+
+
+/*
+        tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch(tab.getPosition()){
+                    case 0:
+                        tabCheck = true;
+                        return;
+                    default:
+                        tabCheck = false;
+                }
+                super.onTabSelected(tab);
+            }
+        }); */
+    }
+
+    public int getTab(){
+        return viewPager.getCurrentItem();
+    }
+
+    public void setTab(int i){
+        viewPager.setCurrentItem(i);
+    }
+
+    public void atualizaConteudo(){
+        //Toast.makeText(this, "Começa a atualizaConteudo", Toast.LENGTH_SHORT).show();
+        boolean mudaTab = false;
+        if (getTab() == 1) mudaTab = true;
+        viewPager.setAdapter(adapter);
+
+        if (mudaTab) setTab(1);
+        if (toolbar.getSubtitle() != null)
+            if (toolbar.getSubtitle().toString() == "")
+                toolbar.setSubtitle("");
 
     }
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
+        Toast.makeText(this, "tab selected", Toast.LENGTH_SHORT).show();
+
+        if (toolbar.getSubtitle().toString() != "") {
+            int numTab = viewPager.getCurrentItem();
+            //Se a tab selecionada for diferente da que estava antes
+            if (numTab == 0) telaC.deselecionaTudo();
+            else telaT.deselecionaTudo();
+        }
         viewPager.setCurrentItem(tab.getPosition());
     }
 
@@ -210,12 +269,10 @@ public class TelaInicialActivity extends AppCompatActivity
     //Retorna o resultado das telas abertas
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         //Caso insere checklists ou tags, atualiza a exibição das tabs
-        if (requestCode == 1 || requestCode == 2) {
-            if(resultCode == Activity.RESULT_OK){
-                arrumaTabs();
-            }
+        if ((requestCode == 1 || requestCode == 2) && resultCode == Activity.RESULT_OK){
+            //atualiza
+            atualizaConteudo();
         }
     }
 
@@ -280,8 +337,6 @@ public class TelaInicialActivity extends AppCompatActivity
 
             case R.id.app_bar_delete:
                 deleta();
-                telaC.deselecionaTudo();
-                telaT.deselecionaTudo();
                 return true;
 
             default:
@@ -305,29 +360,33 @@ public class TelaInicialActivity extends AppCompatActivity
 
     //Faz a deleção dos itens
     public void deleta(){
-        if (tabLayout.getSelectedTabPosition() == tabLayout.getTabAt(0).getPosition()) tabCheck = true;
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.delete_title);
+        if (getTab() == 0) builder.setMessage(R.string.msg_deleteChecklist);
+        else builder.setMessage(R.string.msg_deleteTag);
 
-        builder.setTitle("Remoção");
-        builder.setMessage("Tem certeza que quer remover esses itens?");
-
-        builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (tabCheck){
-                    //Fazer metodo para deletar tanto da checklist qnto da tag
-
+                if (getTab() == 0){
+                    if (deletaChecklist())
+                        setSucessoDeletar(true);
                 } else {
-
+                    if (deletaTag())
+                        setSucessoDeletar(true);
                 }
                 dialog.dismiss();
             }
+
         });
 
-        builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.btnNo, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                if (getTab() == 0)
+                    telaC.deselecionaTudo();
+                else telaT.deselecionaTudo();
+
                 dialog.dismiss();
             }
         });
@@ -336,6 +395,49 @@ public class TelaInicialActivity extends AppCompatActivity
         alert.show();
     }
 
+    public boolean deletaChecklist(){
+       // Toast.makeText(getApplicationContext(), "Pegando os titulos", Toast.LENGTH_SHORT).show();
+
+        //Pega os titulos das checklists selecionadas
+        ArrayList<String> aDeletar = telaC.getSelecionadosTitulos();
+
+        //Se não estiver vazio, pega os ids desses titulos
+        if (aDeletar.isEmpty()) return false;
+
+        //Toast.makeText(getApplicationContext(), "Pegando os ids", Toast.LENGTH_SHORT).show();
+        List<Integer> aDeletarIds = new ArrayList<>();
+        for (int i = 0; i < aDeletar.size(); i++)
+            aDeletarIds.add( bdhelper.buscaIdChecklist(aDeletar.get(i)) );
+
+        //Toast.makeText(getApplicationContext(), "Começando a deletar", Toast.LENGTH_SHORT).show();
+        //Por fim, deleta tudo
+        for (int j = 0; j < aDeletarIds.size(); j++)
+            bdhelper.deletaChecklists(aDeletarIds.get(j));
+
+        return true;
+    }
+
+    public boolean deletaTag(){
+        //Toast.makeText(getApplicationContext(), "Pegando as tags", Toast.LENGTH_SHORT).show();
+
+        //Pega os titulos das checklists selecionadas
+        ArrayList<String> aDeletar = telaT.getSelecionadosTitulos();
+
+        //Se não estiver vazio, pega os ids desses titulos
+        if (aDeletar.isEmpty()) return false;
+
+        //Toast.makeText(getApplicationContext(), "Pegando os ids", Toast.LENGTH_SHORT).show();
+        List<Integer> aDeletarIds = new ArrayList<>();
+        for (int i = 0; i < aDeletar.size(); i++)
+            aDeletarIds.add( bdhelper.buscaIdTag(aDeletar.get(i)) );
+
+       // Toast.makeText(getApplicationContext(), "Começando a deletar", Toast.LENGTH_SHORT).show();
+        //Por fim, deleta tudo
+        for (int j = 0; j < aDeletarIds.size(); j++)
+            bdhelper.deletaTags(aDeletarIds.get(j));
+
+        return true;
+    }
 
     //Getter e setter da toolbar
     public Toolbar getToolbar() {

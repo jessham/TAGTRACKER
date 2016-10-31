@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.security.AccessController.getContext;
 import static java.sql.DriverManager.println;
 
 /**
@@ -131,8 +132,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean insereChecklist(String titulo) {
     /* primeiro insere o titulo da checklist */
 
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
         try {
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
@@ -141,6 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Insert the new row, returning the primary key value of the new row
             long newRowId;
+            SQLiteDatabase db = getWritableDatabase();
             newRowId = db.insert(
                     tabelaChecklists.nomeTabela,
                     null,
@@ -154,7 +154,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean insereTags(String titulo) {
-        SQLiteDatabase db = this.getWritableDatabase();
+
         try {
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
@@ -163,6 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Insert the new row, returning the primary key value of the new row
             long newRowId;
+            SQLiteDatabase db = getWritableDatabase();
             newRowId = db.insert(
                     tabelaTags.nomeTabela,
                     null,
@@ -178,7 +179,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean insereAssocia(int idChecklists, int idTags) {
         // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
 
         try {
             // Create a new map of values, where column names are the keys
@@ -188,6 +188,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Insert the new row, returning the primary key value of the new row
             long newRowId;
+            SQLiteDatabase db = getWritableDatabase();
             newRowId = db.insert(
                     tabelaAssocia.nomeTabela,
                     null,
@@ -202,10 +203,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int buscaIdTag(String rotulo){
-        SQLiteDatabase db = this.getReadableDatabase();
         int resp = -1;
 
         try {
+            SQLiteDatabase db = getReadableDatabase();
             Cursor cursor = db.rawQuery("select " + tabelaTags.colunaID +
                     " from " + tabelaTags.nomeTabela + " where " +
                     tabelaTags.colunaTitulo + " = ?", new String[] {rotulo});
@@ -226,10 +227,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int buscaIdChecklist(String titulo){
-        SQLiteDatabase db = this.getReadableDatabase();
         int resp = -1;
 
         try {
+            SQLiteDatabase db = getReadableDatabase();
             Cursor cursor = db.rawQuery("select " + tabelaChecklists.colunaID +
                     " from " + tabelaChecklists.nomeTabela + " where " +
                     tabelaChecklists.colunaTitulo + " = ?" , new String[]  {titulo});
@@ -251,10 +252,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //LEITURA
     public ArrayList<String> leChecklist(){
-        SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<String> resp = new ArrayList<String>();
 
         try {
+            SQLiteDatabase db = getReadableDatabase();
             Cursor cursor = db.rawQuery("select " + tabelaChecklists.colunaTitulo +
                                                     " from " + tabelaChecklists.nomeTabela, null);
 
@@ -275,9 +276,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<String> leTags(){
         ArrayList<String> resp = new ArrayList<String>();
-        SQLiteDatabase db = this.getReadableDatabase();
 
         try {
+            SQLiteDatabase db = getReadableDatabase();
             Cursor cursor = db.rawQuery("select " + tabelaTags.colunaTitulo +
                                         " from " + tabelaTags.nomeTabela, null);
 
@@ -300,7 +301,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<String> resp = new ArrayList<String>();
 
         try {
-            Cursor cursor = getReadableDatabase().rawQuery(" select " + tabelaTags.colunaTitulo + " from " + tabelaTags.nomeTabela +
+            SQLiteDatabase db = getReadableDatabase();
+            Cursor cursor = db.rawQuery(" select " + tabelaTags.colunaTitulo + " from " + tabelaTags.nomeTabela +
                     " where " + tabelaTags.colunaID + " in ( select " + tabelaAssocia.tagsID +
                     " from " + tabelaAssocia.nomeTabela + " where " + tabelaAssocia.checklistsID + " = ? )", new String[] {idChecklist});
 
@@ -311,82 +313,125 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 } while (cursor.moveToNext());
             }
             cursor.close();
-        }  catch (Exception e){
-            Toast.makeText(contexto,"ERROR" + e.getMessage(),Toast.LENGTH_LONG).show();
-        }
-        return resp;
-    }
-
-    public ArrayList<String> leAssocia(){
-        ArrayList<String> resp = new ArrayList<String>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        try {
-            Cursor cursor = db.rawQuery("select * from " + tabelaAssocia.nomeTabela, null);
-
-            if (cursor.moveToFirst()) {
-                do {
-                    String linea = cursor.getString(0);
-                    resp.add(linea);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
             db.close();
-        } catch (Exception e){
-            Toast.makeText(contexto,R.string.erro_exibirTags,Toast.LENGTH_SHORT).show();
+        }  catch (Exception e){
+            Toast.makeText(contexto,R.string.erro_leItens,Toast.LENGTH_LONG).show();
         }
-
         return resp;
     }
+
 
     //REMOÇÃO
-    public void deletaAssocia(int checklistsID, int tagsID){
+    public boolean deletaAssocia(int checklistsID, int tagsID){
 
-        if (tagsID != 0 && checklistsID != 0){
-            // Define 'where' part of query.
-            String selection = tabelaAssocia.checklistsID + " = ? and " +
-                    tabelaAssocia.tagsID + " = ? ";
-            // Specify arguments in placeholder order.
-            String[] selectionArgs = {String.valueOf(checklistsID), String.valueOf(tagsID)};
-            // Issue SQL statement.
-            getWritableDatabase().delete(tabelaAssocia.nomeTabela, selection, selectionArgs);
-        } else if (tagsID == 0) {
-            String selection2 = tabelaAssocia.checklistsID + " = ?";
-            String[] selectionArgs2 = { String.valueOf(checklistsID) };
-            getWritableDatabase().delete(tabelaAssocia.nomeTabela, selection2, selectionArgs2);
-        } else if (checklistsID == 0){
-            String selection3 = tabelaAssocia.tagsID + " = ?";
-            String[] selectionArgs3 = { String.valueOf(tagsID) };
-            getWritableDatabase().delete(tabelaAssocia.nomeTabela, selection3, selectionArgs3);
+        if (tagsID != -1 && checklistsID != -1){
+
+            try{
+                // Define 'where' part of query.
+                String selection = tabelaAssocia.checklistsID + " = ? and " + tabelaAssocia.tagsID + " = ? ";
+                // Specify arguments in placeholder order.
+                String[] selectionArgs = {String.valueOf(checklistsID), String.valueOf(tagsID)};
+                // Issue SQL statement.
+
+
+                SQLiteDatabase db = getWritableDatabase();
+                db.delete(tabelaAssocia.nomeTabela, selection, selectionArgs);
+
+                db.close();
+                return true;
+
+            }  catch (Exception e){
+                Toast.makeText(contexto,"ERROR DEL ASS 1 " + e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (tagsID == -1) {
+
+            try{
+                String selection2 = tabelaAssocia.checklistsID + " = ?";
+                String[] selectionArgs2 = { String.valueOf(checklistsID) };
+
+                SQLiteDatabase db = getWritableDatabase();
+                db.delete(tabelaAssocia.nomeTabela, selection2, selectionArgs2);
+
+                db.close();
+                return true;
+
+            }  catch (Exception e){
+                Toast.makeText(contexto,"ERROR DEL ASS 2 " + e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (checklistsID == -1){
+
+            try{
+                String selection3 = tabelaAssocia.tagsID + " = ?";
+                String[] selectionArgs3 = { String.valueOf(tagsID) };
+
+                SQLiteDatabase db = getWritableDatabase();
+                db.delete(tabelaAssocia.nomeTabela, selection3, selectionArgs3);
+
+                db.close();
+                return true;
+
+            }  catch (Exception e){
+                Toast.makeText(contexto,"ERROR DEL ASS 3 " + e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+
         }
+        return false;
     }
 
-    public void deletaChecklists(int checklistsID){
+    public boolean deletaChecklists(int checklistsID){
         try {
+
             // Define 'where' part of query.
             String selection = tabelaChecklists.colunaID + " = ?";
             // Specify arguments in placeholder order.
             String[] selectionArgs = {String.valueOf(checklistsID)};
+
+
+            if (!deletaAssocia(checklistsID, -1))
+                return false;
+
+
             // Issue SQL statement.
-            deletaAssocia(checklistsID, 0);
-            getWritableDatabase().delete(tabelaChecklists.nomeTabela, selection, selectionArgs);
+            SQLiteDatabase db = getWritableDatabase();
+            db.delete(tabelaChecklists.nomeTabela, selection, selectionArgs);
+
+
+            db.close();
+            return true;
+
         }  catch (Exception e){
-            Toast.makeText(contexto,"ERROR" + e.getMessage(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(contexto,"ERROR DEK CH " + e.getMessage(),Toast.LENGTH_SHORT).show();
         }
+        return false;
     }
 
-    public void deletaTags(int tagsID){
+    public boolean deletaTags(int tagsID){
+
         try {
             // Define 'where' part of query.
             String selection = tabelaTags.colunaID + " = ?";
             // Specify arguments in placeholder order.
             String[] selectionArgs = {String.valueOf(tagsID)};
+
+
+            if (!deletaAssocia(-1, tagsID))
+                return false;
+
             // Issue SQL statement.
-            deletaAssocia(0, tagsID);
-            getWritableDatabase().delete(tabelaTags.nomeTabela, selection, selectionArgs);
+            SQLiteDatabase db = getWritableDatabase();
+            db.delete(tabelaTags.nomeTabela, selection, selectionArgs);
+
+
+            db.close();
+            return true;
+
         }  catch (Exception e){
-            Toast.makeText(contexto,"ERROR" + e.getMessage(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(contexto,"ERROR DEL TAG" + e.getMessage(),Toast.LENGTH_SHORT).show();
         }
+
+        return false;
     }
 
     //ATUALIZAÇÃO
@@ -434,27 +479,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //BUSCA
     public int retornaProxIDTags(){
         int id = 0;
+
         try {
-            Cursor cursor = getReadableDatabase().rawQuery("select coalesce( max( " + tabelaTags.colunaID
+            SQLiteDatabase db = getReadableDatabase();
+            Cursor cursor = db.rawQuery("select coalesce( max( " + tabelaTags.colunaID
                                         + " ), 0) from " + tabelaTags.nomeTabela, null);
 
             cursor.moveToFirst();
             id = cursor.getInt(0);
 
             cursor.close();
+            db.close();
         }  catch (Exception e){}
         return id + 1;
     }
 
     public int retornaProxIDChecklists(){
         int id = 0;
+
         try {
-            Cursor cursor = getReadableDatabase().rawQuery("select coalesce( max( id ), 0) from "
+            SQLiteDatabase db = getReadableDatabase();
+            Cursor cursor = db.rawQuery("select coalesce( max( id ), 0) from "
                     + tabelaChecklists.nomeTabela, null);
 
             cursor.moveToFirst();
             id = cursor.getInt(0);
+
             cursor.close();
+            db.close();
         }  catch (Exception e){}
         return id + 1;
     }
