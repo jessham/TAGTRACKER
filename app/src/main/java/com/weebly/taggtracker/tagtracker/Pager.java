@@ -2,6 +2,7 @@ package com.weebly.taggtracker.tagtracker;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
@@ -13,9 +14,10 @@ import java.util.List;
  * Serve para trocar as páginas da tab
  */
 
-public class Pager extends FragmentStatePagerAdapter {
+public class Pager extends FragmentPagerAdapter {
     private final List<Fragment> mFragments = new ArrayList<>();
     private final List<String> mFragmentTitles = new ArrayList<>();
+    private int numItens = 2;
 
     public Pager(FragmentManager fm) {
         super(fm);
@@ -29,7 +31,6 @@ public class Pager extends FragmentStatePagerAdapter {
         fragment.setHasOptionsMenu(hasOptionsMenu);
         mFragments.add(fragment);
         mFragmentTitles.add(title);
-
     }
 
     @Override
@@ -39,7 +40,7 @@ public class Pager extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return mFragments.size();
+        return numItens;
     }
 
     @Override
