@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 public class PremiumActivity extends TelaInicialActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -30,14 +31,14 @@ public class PremiumActivity extends TelaInicialActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_premium);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_cadastrachecklist);
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_cadastrachecklist);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        toggle.syncState();*/
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -84,8 +85,7 @@ public class PremiumActivity extends TelaInicialActivity
             if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
                 // get tag info
                 mytag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-                String toWriteOnTag = "ESCREVENDO NA TAG";
-                writeTag(mytag, toWriteOnTag);
+                //writeTag(mytag, 10);
                 mTextView.setText(readTag(mytag));
                 Toast.makeText(this, "NFC Tag detected", Toast.LENGTH_LONG).show();
             }
@@ -94,7 +94,7 @@ public class PremiumActivity extends TelaInicialActivity
 
     //private final String TAG = MifareUltralightTagTester.class.getSimpleName();
 
-    public void writeTag(Tag tag, String tagText) {
+    public void writeTag(Tag tag, int tagId) {
         MifareUltralight ultralight = MifareUltralight.get(tag);
         try {
             ultralight.connect();
@@ -119,13 +119,16 @@ public class PremiumActivity extends TelaInicialActivity
 
             //mTextView.setText(text.toString());
 
-            ultralight.writePage(4, "Oi, ".getBytes(Charset.forName("UTF-8")));
-            ultralight.writePage(5, "tudo".getBytes(Charset.forName("UTF-8")));
+            String tagText = Integer.toString(tagId);
+            String idFormattedToString = String.format("%0" + (4 - tagText.length()) + "d%s", 0, tagText);
+
+            ultralight.writePage(4, intToByteArray(tagId));
+            /*ultralight.writePage(5, "tudo".getBytes(Charset.forName("UTF-8")));
             ultralight.writePage(6, " bem".getBytes(Charset.forName("UTF-8")));
             ultralight.writePage(7, "? :)".getBytes(Charset.forName("UTF-8")));
             ultralight.writePage(8, "oi  ".getBytes(Charset.forName("UTF-8")));
             ultralight.writePage(9, "tudo".getBytes(Charset.forName("UTF-8")));
-            ultralight.writePage(10, " bem".getBytes(Charset.forName("UTF-8")));
+            ultralight.writePage(10, " bem".getBytes(Charset.forName("UTF-8")));*/
 
         } catch (IOException e) {
             //Log.e(TAG, "IOException while closing MifareUltralight...", e);
@@ -145,7 +148,14 @@ public class PremiumActivity extends TelaInicialActivity
         try {
             mifare.connect();
             byte[] payload = mifare.readPages(4);
-            return new String(payload, Charset.forName("UTF-8"));
+            byte[] fourBytes = Arrays.copyOfRange(payload,0,4);
+
+            String fourBytesToString = new String(fourBytes, Charset.forName("UTF-8"));
+
+            // obs: o app quebra quando a tag armazena "-1"
+            int idNumber = Integer.parseInt(new String(fourBytesToString));
+
+            return new String(Integer.toString(idNumber));
         } catch (IOException e) {
             mTextView.setText("Erro ao tentar ler tag 1.");
         } finally {
@@ -218,4 +228,22 @@ public class PremiumActivity extends TelaInicialActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }*/
+
+    public static int byteArrayToInt(byte[] b)
+    {
+        return   b[3] & 0xFF |
+                (b[2] & 0xFF) << 8 |
+                (b[1] & 0xFF) << 16 |
+                (b[0] & 0xFF) << 24;
+    }
+
+    public static byte[] intToByteArray(int a)
+    {
+        return new byte[] {
+                (byte) ((a >> 24) & 0xFF),
+                (byte) ((a >> 16) & 0xFF),
+                (byte) ((a >> 8) & 0xFF),
+                (byte) (a & 0xFF)
+        };
+    }
 }

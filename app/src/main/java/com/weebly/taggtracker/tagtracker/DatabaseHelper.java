@@ -169,7 +169,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     null,
                     values);
             db.close();
-            Toast.makeText(contexto,R.string.tag_inserted,Toast.LENGTH_SHORT).show();
+            //Toast.makeText(contexto,R.string.tag_inserted,Toast.LENGTH_SHORT).show();
         } catch (Exception e){
             Toast.makeText(contexto,R.string.tag_notinserted,Toast.LENGTH_SHORT).show();
             return false;
