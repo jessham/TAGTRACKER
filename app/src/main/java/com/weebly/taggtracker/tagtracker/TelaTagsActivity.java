@@ -1,6 +1,7 @@
 package com.weebly.taggtracker.tagtracker;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.widget.Toolbar;
@@ -142,12 +143,11 @@ public class TelaTagsActivity extends ListFragment {
             //As ações da toolbar dependem desse resultado
             configuraToolbar();
         }
-        //Encontra a id da checklist selecionada
-        String item = l.getItemAtPosition(position).toString();
-        int checklist = bd.buscaIdChecklist(item);
 
-        //Econtra as tags relacionadas a essa checklist
-        ArrayList<String> lista = bd.leItensListas(Integer.toString(checklist));
+        VisualizaTagActivity visualizacao = new VisualizaTagActivity();
+        Intent it = new Intent(getActivity(), visualizacao.getClass());
+        it.putExtra("tag-visual-key", l.getItemAtPosition(position).toString().trim());
+        getActivity().startActivityForResult(it, 4);
     }
 
 
@@ -159,26 +159,10 @@ public class TelaTagsActivity extends ListFragment {
         this.bd = bd;
     }
 
-    public void atualizaAdapter(){
-        this.adapter.notifyDataSetChanged();
-    }
-
-    public ArrayList<Integer> getSelecionados() {
-        return selecionados;
-    }
-
-    public void setSelecionados(ArrayList<Integer> selecionados) {
-        this.selecionados = selecionados;
-
-
-    }
-
     public ArrayList<String> getSelecionadosTitulos (){
         ArrayList<String> resp = new ArrayList<String>();
 
-
         for (int i = 0; i < selecionados.size(); i++){
-
             int item = selecionados.get(i);
             String titulo = listview.getItemAtPosition(item).toString();
 

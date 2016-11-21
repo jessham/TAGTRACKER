@@ -20,18 +20,47 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class CadastraTagsActivity extends AppCompatActivity {
-    DatabaseHelper bd;
-    Toolbar toolbar;
-
-    NfcAdapter mNfcAdapter;
-    PendingIntent pendingIntent;
-    Tag mytag;
-    String rotulo;
+    private DatabaseHelper bd;
+    private Toolbar toolbar;
+    private NfcAdapter mNfcAdapter;
+    private PendingIntent pendingIntent;
+    private Tag mytag;
+    private String rotulo;
+    private boolean modoEditar;
     boolean savedInDatabase;
+
+
+    /* ********************************************************************************************
+        GETTERS AND SETTERS
+     ******************************************************************************************** */
+
+
+    public String getRotulo() {
+        return rotulo;
+    }
+
+    public void setRotulo(String rotulo) {
+        this.rotulo = rotulo;
+    }
+
+    public boolean isModoEditar() {
+        return modoEditar;
+    }
+
+    public void setModoEditar(boolean modoEditar) {
+        this.modoEditar = modoEditar;
+    }
 
     public CadastraTagsActivity() {
         bd = new DatabaseHelper(this);
     }
+
+
+
+    /* ********************************************************************************************
+        MÉTODOS DE INICIALIZAÇÃO
+     ******************************************************************************************** */
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -46,53 +75,24 @@ public class CadastraTagsActivity extends AppCompatActivity {
         pendingIntent = PendingIntent.getActivity(CadastraTagsActivity.this, 0, new Intent(CadastraTagsActivity.this,
                 getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
+
+
+        //Verifica se esta no modulo de edicao
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            setRotulo(extras.getString("tag-edit-key"));
+            setModoEditar(true);
+
+            EditText txtTitulo = (EditText) findViewById(R.id.txtTitleTag);
+            txtTitulo.setText(getRotulo());
+        }
+
         //Comportamento para salvar a tag
         View btnSalvar = findViewById(R.id.btnSalvarTag);
-        final EditText txtTitulo = (EditText ) findViewById(R.id.txtTitleTag);
         btnSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Verifica se vazio
-                if (txtTitulo.getText().toString().isEmpty()) {
-                    txtTitulo.setError("Digite um rótulo!");
-                    txtTitulo.setText("");
-                    return;
-                }
-                //Verifica se maior que 3  30 caracteres
-                if (txtTitulo.getText().length() < 3 || txtTitulo.getText().length() > 30) {
-                    txtTitulo.setError("O rótulo deve ter entre 3 e 30 caracteres!");
-                    txtTitulo.setText("");
-                    return;
-                }
-                //Verifica se existe checklist igual
-                ArrayList<String> listaTotal = bd.leTags();
-
-                for (int i = 0; i < listaTotal.size(); i++) {
-                    if (listaTotal.get(i).toLowerCase().contains(txtTitulo.getText().toString().toLowerCase())) {
-                        txtTitulo.setError("Já existe uma checklist com esse título!");
-                        txtTitulo.setText("");
-                        return;
-                    }
-                }
-
-                if (bd.insereTags(txtTitulo.getText().toString())) {
-                    savedInDatabase = true;
-                    rotulo = txtTitulo.getText().toString();
-
-                    // 1. Instantiate an AlertDialog.Builder with its constructor
-                    AlertDialog.Builder builder = new AlertDialog.Builder(CadastraTagsActivity.this);
-                    // 2. Chain together various setter methods to set the dialog characteristics
-                    builder.setMessage("Aproxime uma tag NFC para completar o cadastro").setTitle("");
-                    // 3. Get the AlertDialog from create()
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-                    //Intent returnIntent = new Intent();
-                    setResult(Activity.RESULT_OK, getIntent());
-                    //finish();
-                }
-
-                //txtTitulo.setText("");
+                salvaTag();
             }
         });
 
@@ -181,6 +181,11 @@ public class CadastraTagsActivity extends AppCompatActivity {
         }
     }
 
+
+    /* ********************************************************************************************
+        OUTROS
+     ******************************************************************************************** */
+
     public void writeTag(Tag tag, int tagId) {
         MifareUltralight ultralight = MifareUltralight.get(tag);
         try {
@@ -206,5 +211,86 @@ public class CadastraTagsActivity extends AppCompatActivity {
             }
         }
     }
+
+
+
+    public void salvaTag(){
+        final EditText txtTitulo = (EditText ) findViewById(R.id.txtTitleTag);
+
+        //Verifica se vazio
+        if (txtTitulo.getText().toString().isEmpty()) {
+            txtTitulo.setError("Digite um rótulo!");
+            txtTitulo.setText("");
+            return;
+        }
+        //Verifica se maior que 3  30 caracteres
+        if (txtTitulo.getText().length() < 3 || txtTitulo.getText().length() > 30) {
+            txtTitulo.setError("O rótulo deve ter entre 3 e 30 caracteres!");
+            txtTitulo.setText("");
+            return;
+        }
+
+        if (!isModoEditar()) {
+            //Verifica se existe tag igual
+            ArrayList<String> listaTotal = bd.leTags();
+
+            for (int i = 0; i < listaTotal.size(); i++) {
+                if (listaTotal.get(i).toLowerCase().contains(txtTitulo.getText().toString().toLowerCase())) {
+                    txtTitulo.setError("Já existe uma tag com esse rotulo!");
+                    txtTitulo.setText("");
+                    return;
+                }
+            }
+        }
+
+        if (bd.insereTags(txtTitulo.getText().toString())) {
+            savedInDatabase = true;
+            rotulo = txtTitulo.getText().toString();
+
+            // 1. Instantiate an AlertDialog.Builder with its constructor
+            AlertDialog.Builder builder = new AlertDialog.Builder(CadastraTagsActivity.this);
+            // 2. Chain together various setter methods to set the dialog characteristics
+            builder.setMessage("Aproxime uma tag NFC para completar o cadastro").setTitle("");
+            // 3. Get the AlertDialog from create()
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            //Intent returnIntent = new Intent();
+            setResult(Activity.RESULT_OK, getIntent());
+            //finish();
+        }
+
+        //txtTitulo.setText("");
+
+    }
+
+
+
+
+
+
+    public void salva(){
+
+        gravaTag();
+        if (verificaGravacao()) {
+            //salva no bd
+
+        } else {
+            //aparece mensagem instruindo ou avisando
+            //dependendo do comportamento return ou salva();
+        }
+
+    }
+
+    public void gravaTag(){
+        //tenta umas 3 vezes
+    }
+
+    public boolean verificaGravacao(){
+
+        return true;
+    }
+
+
 }
 

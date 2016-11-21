@@ -1,12 +1,9 @@
 package com.weebly.taggtracker.tagtracker;
 
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,8 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 
 public class TelaChecklistActivity extends ListFragment {
@@ -136,19 +131,6 @@ public class TelaChecklistActivity extends ListFragment {
         this.bd = bd;
     }
 
-    public void atualizaAdapter(){
-        Toast.makeText(getContext(), "Faz a atualizaConteudo", Toast.LENGTH_SHORT).show();
-        this.adapter.notifyDataSetChanged();
-    }
-
-    public ArrayList<Integer> getSelecionados() {
-        return selecionados;
-    }
-
-    public void setSelecionados(ArrayList<Integer> selecionados) {
-        this.selecionados = selecionados;
-    }
-
     public ArrayList<String> getSelecionadosTitulos (){
         ArrayList<String> resp = new ArrayList<String>();
 
@@ -229,15 +211,6 @@ public class TelaChecklistActivity extends ListFragment {
         }
         configuraToolbar();
     }
-    //Retorna o resultado das telas abertas
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //Caso insere checklists ou tags, atualiza a exibição das tabs
-        if (requestCode == 3){
-            Toast.makeText(getActivity(), "oioi", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 }
 
 

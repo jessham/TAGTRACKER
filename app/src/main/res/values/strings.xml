@@ -13,6 +13,7 @@
     <string name="title_CadastraChecklistsActivity">Cadastrar checklist</string>
     <string name="title_CadastraTagsActivity">Cadastrar tags</string>
     <string name="title_VisualizaChecklistsActivity">Visualizar checklist</string>
+    <string name="title_VisualizaTagsActivity">Visualizar tag</string>
     <string name="title_EditaChecklistsActivity">Editar checklist</string>
 
 

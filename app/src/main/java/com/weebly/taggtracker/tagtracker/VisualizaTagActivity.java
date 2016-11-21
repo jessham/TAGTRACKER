@@ -23,9 +23,9 @@ import java.util.List;
 
 import static java.sql.DriverManager.println;
 
-public class VisualizaChecklistActivity extends AppCompatActivity {
+public class VisualizaTagActivity extends AppCompatActivity {
     private DatabaseHelper bd = new DatabaseHelper(this);
-    private String tituloChecklist; //checklist que será visualizada ou editada
+    private String rotuloTag; //tag que será visualizada ou editada
     private Toolbar toolbar;
     private ArrayList<String> array;
 
@@ -35,12 +35,12 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
      * ********************************************************************************************/
 
 
-    public String getTituloChecklist() {
-        return tituloChecklist;
+    public String getRotuloTag() {
+        return rotuloTag;
     }
 
-    public void setTituloChecklist(String tituloChecklist) {
-        this.tituloChecklist = tituloChecklist;
+    public void setRotuloTag(String rotuloTag) {
+        this.rotuloTag = rotuloTag;
     }
 
     public Toolbar getToolbar() {
@@ -51,19 +51,13 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
         this.toolbar = toolbar;
     }
 
-    public DatabaseHelper getBd() {
-        return bd;
+    VisualizaTagActivity(String rotulo){
+        setRotuloTag(rotulo);
     }
 
-    public void setBd(DatabaseHelper bd) {
-        this.bd = bd;
-    }
+    public VisualizaTagActivity(){
 
-    VisualizaChecklistActivity(String titulo){
-        setTituloChecklist(titulo);
     }
-
-    public VisualizaChecklistActivity(){}
 
 
 
@@ -75,44 +69,25 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_visualiza_checklist);
+        setContentView(R.layout.activity_visualiza_tag);
 
         //Configura a toolbar
-        toolbar = (Toolbar) findViewById(R.id.toolbar_visualizachecklist);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_visualizaTag);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            setTituloChecklist(extras.getString("checklist-visual-key"));
+            setRotuloTag(extras.getString("tag-visual-key"));
 
             //Comportamento dos itens texto
-            TextView titulo = (TextView) findViewById(R.id.txtTitleVisualChecklist);
-            titulo.setText(getTituloChecklist());
+            TextView titulo = (TextView) findViewById(R.id.txtTitleVisualTag);
+            titulo.setText(getRotuloTag());
         }
-
-
-        //Criamos o array de dados e o colocamos no adapter
-        final ArrayAdapter<String> adaptador;
-
-        String ti = getTituloChecklist();
-        int d =  bd.buscaIdChecklist(getTituloChecklist());
-
-        array = bd.leItensListas(String.valueOf(d));
-        adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, array);
-
-
-        //Colocamos o adaptador na listview
-        final ListView listView = (ListView) findViewById(R.id.listviewTags);
-
-        if (adaptador == null){
-            finish();
-        }
-        listView.setAdapter(adaptador);
 
 
         //Comportamento para checar a checklist
-        View btnCheck = findViewById(R.id.btnChecarChecklist);
+        View btnCheck = findViewById(R.id.btnChecarTag);
         btnCheck.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -121,8 +96,9 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
             }
         });
 
+
         //Comportamento para cancelar visualizar a tag
-        View btnCancelar = findViewById(R.id.btnCancelarVisualChecklist);
+        View btnCancelar = findViewById(R.id.btnCancelarVisualTag);
         btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,7 +118,7 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         new MenuInflater(this).inflate(R.menu.menu_toolbar, menu);
         apareceMenu(false, true, true);
-        toolbar.setTitle(R.string.title_VisualizaChecklistsActivity);
+        toolbar.setTitle(R.string.title_VisualizaTagsActivity);
         toolbar.getMenu().findItem(R.id.app_bar_edit).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         toolbar.getMenu().findItem(R.id.app_bar_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return (super.onCreateOptionsMenu(menu));
@@ -176,16 +152,16 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
         getToolbar().getMenu().findItem(R.id.app_bar_edit).setVisible(edita);
     }
 
-    //Deleta a checklist, confirma primeiro
+    //Deleta a tag, confirma primeiro
     public void deleta(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.delete_title);
-        builder.setMessage(R.string.msg_deleteThisChecklist);
+        builder.setMessage(R.string.msg_deleteThisTag);
 
         builder.setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                deletaChecklist();
+                deletaTag();
                 dialog.dismiss();
             }
 
@@ -202,18 +178,17 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
         alert.show();
     }
 
-    public void deletaChecklist(){
-        //Deleta a checklist e termina a atividade
-        bd.deletaChecklists(bd.buscaIdChecklist(getTituloChecklist()));
+    public void deletaTag(){
+        //Deleta a tag e termina a atividade
+        bd.deletaTags(bd.buscaIdTag(getRotuloTag()));
         finish();
     }
 
-    //Edita a checklist
+    //Edita a tag
     public void edita(){
-        CadastraChecklistsActivity ct = new CadastraChecklistsActivity();
+        CadastraTagsActivity ct = new CadastraTagsActivity();
         Intent it = new Intent(this, ct.getClass());
-        array.add(getTituloChecklist());
-        it.putExtra("checklist-edit-key", array);
+        it.putExtra("tag-edit-key", getRotuloTag());
         startActivity(it);
 
         finish();

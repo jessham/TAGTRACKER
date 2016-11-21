@@ -273,7 +273,9 @@ public class TelaInicialActivity extends AppCompatActivity
         if ((requestCode == 1 || requestCode == 2) && resultCode == Activity.RESULT_OK){
             //atualiza
             atualizaConteudo();
-        } else if (requestCode == 3){
+        } else
+        //caso deleta algo durante a visualização
+        if (requestCode == 3 || requestCode == 4){
             atualizaConteudo();
         }
     }
