@@ -1,6 +1,8 @@
 package com.weebly.taggtracker.tagtracker;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
@@ -73,9 +75,7 @@ public class TelaChecklistActivity extends ListFragment {
         listview = getListView();
 
         adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, bd.leChecklist());
-
         setListAdapter(adapter);
-
 
         //comportamento para qndo o usuario pressionar por um longo tempo
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -118,12 +118,13 @@ public class TelaChecklistActivity extends ListFragment {
             //As ações da toolbar dependem desse resultado
             configuraToolbar();
         }
-        //Encontra a id da checklist selecionada
-        String item = l.getItemAtPosition(position).toString();
-        int checklist = bd.buscaIdChecklist(item);
 
-        //Econtra as tags relacionadas a essa checklist
-        ArrayList<String> lista = bd.leItensListas(Integer.toString(checklist));
+
+        VisualizaChecklistActivity visualizacao = new VisualizaChecklistActivity();
+        Intent it = new Intent(getActivity(), visualizacao.getClass());
+        it.putExtra("checklist-visual-key", l.getItemAtPosition(position).toString().trim());
+        getActivity().startActivityForResult(it, 3);
+
     }
 
 
@@ -146,8 +147,6 @@ public class TelaChecklistActivity extends ListFragment {
 
     public void setSelecionados(ArrayList<Integer> selecionados) {
         this.selecionados = selecionados;
-
-
     }
 
     public ArrayList<String> getSelecionadosTitulos (){
@@ -230,6 +229,15 @@ public class TelaChecklistActivity extends ListFragment {
         }
         configuraToolbar();
     }
+    //Retorna o resultado das telas abertas
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Caso insere checklists ou tags, atualiza a exibição das tabs
+        if (requestCode == 3){
+            Toast.makeText(getActivity(), "oioi", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
 
 

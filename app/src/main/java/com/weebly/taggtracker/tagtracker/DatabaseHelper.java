@@ -434,12 +434,75 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
+
+
     //ATUALIZAÇÃO
-    public void atualizaChecklists(String titulo, int checklistsID) {
+
+    public boolean atualizaAssocia(int checklistsID, int tagsID){
+
+        if (tagsID != -1 && checklistsID != -1){
+
+            try{
+                // Define 'where' part of query.
+                String selection = tabelaAssocia.checklistsID + " = ? and " + tabelaAssocia.tagsID + " = ? ";
+                // Specify arguments in placeholder order.
+                String[] selectionArgs = {String.valueOf(checklistsID), String.valueOf(tagsID)};
+                // Issue SQL statement.
+
+
+                SQLiteDatabase db = getWritableDatabase();
+                db.delete(tabelaAssocia.nomeTabela, selection, selectionArgs);
+
+                db.close();
+                return true;
+
+            }  catch (Exception e){
+                Toast.makeText(contexto,"ERROR DEL ASS 1 " + e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (tagsID == -1) {
+
+            try{
+                String selection2 = tabelaAssocia.checklistsID + " = ?";
+                String[] selectionArgs2 = { String.valueOf(checklistsID) };
+
+                SQLiteDatabase db = getWritableDatabase();
+                db.delete(tabelaAssocia.nomeTabela, selection2, selectionArgs2);
+
+                db.close();
+                return true;
+
+            }  catch (Exception e){
+                Toast.makeText(contexto,"ERROR DEL ASS 2 " + e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (checklistsID == -1){
+
+            try{
+                String selection3 = tabelaAssocia.tagsID + " = ?";
+                String[] selectionArgs3 = { String.valueOf(tagsID) };
+
+                SQLiteDatabase db = getWritableDatabase();
+                db.delete(tabelaAssocia.nomeTabela, selection3, selectionArgs3);
+
+                db.close();
+                return true;
+
+            }  catch (Exception e){
+                Toast.makeText(contexto,"ERROR DEL ASS 3 " + e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+
+        }
+        return false;
+    }
+
+    public boolean atualizaChecklists(String titulo, int checklistsID) {
         try {
+            Toast.makeText(contexto, "Começa atualiza para o id = " + String.valueOf(checklistsID), Toast.LENGTH_LONG).show();
             // New value for one column
             ContentValues values = new ContentValues();
             values.put(tabelaChecklists.colunaTitulo, titulo);
+
 
             // Which row to update, based on the ID
             String selection = tabelaChecklists.colunaID + " = ?";
@@ -450,9 +513,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     values,
                     selection,
                     selectionArgs);
+            Toast.makeText(contexto,R.string.checklist_updated,Toast.LENGTH_SHORT).show();
+            return true;
         } catch (Exception e){
-            Toast.makeText(contexto,"ERROR" + e.getMessage(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(contexto,R.string.checklist_notupdated,Toast.LENGTH_SHORT).show();
         }
+        return false;
     }
 
     public void atualizatags(String titulo, int tagsID) {

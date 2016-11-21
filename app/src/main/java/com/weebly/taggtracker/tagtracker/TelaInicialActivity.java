@@ -273,6 +273,8 @@ public class TelaInicialActivity extends AppCompatActivity
         if ((requestCode == 1 || requestCode == 2) && resultCode == Activity.RESULT_OK){
             //atualiza
             atualizaConteudo();
+        } else if (requestCode == 3){
+            atualizaConteudo();
         }
     }
 
@@ -307,11 +309,6 @@ public class TelaInicialActivity extends AppCompatActivity
     }
 
 
-
-
-
-
-
     /* ********************************************************************************************
         MÉTODOS DA TOOLBAR
      ******************************************************************************************** */
@@ -319,7 +316,7 @@ public class TelaInicialActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         new MenuInflater(this).inflate(R.menu.menu_toolbar, menu);
-        apareceMenu(true, false);
+        apareceMenu(true, false, false);
         return (super.onCreateOptionsMenu(menu));
     }
 
@@ -348,9 +345,10 @@ public class TelaInicialActivity extends AppCompatActivity
     }
 
     //Configura as opções visiveis do menu da toolbar
-    public void apareceMenu(boolean pesquisa, boolean deleta){
+    public void apareceMenu(boolean pesquisa, boolean deleta, boolean edita){
         getToolbar().getMenu().findItem(R.id.app_bar_delete).setVisible(deleta);
         getToolbar().getMenu().findItem(R.id.app_bar_search).setVisible(pesquisa);
+        getToolbar().getMenu().findItem(R.id.app_bar_edit).setVisible(edita);
     }
 
     //Faz a pesquisa dos itens

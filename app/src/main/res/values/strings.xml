@@ -12,6 +12,8 @@
     <string name="title_activity_premium">PremiumActivity</string>
     <string name="title_CadastraChecklistsActivity">Cadastrar checklist</string>
     <string name="title_CadastraTagsActivity">Cadastrar tags</string>
+    <string name="title_VisualizaChecklistsActivity">Visualizar checklist</string>
+    <string name="title_EditaChecklistsActivity">Editar checklist</string>
 
 
     <!-- SOBRE NFC -->
@@ -21,13 +23,19 @@
 
 
     <!-- SOBRE INSERÇÃO E EXCLUSÃO -->
-    <string name="tag_inserted">A tag foi inserida com sucesso</string>
+    <string name="tag_inserted">A tag foi inserida</string>
     <string name="tag_notinserted">Erro ao inserir a tag</string>
-    <string name="checklist_inserted">A checklist foi inserida com sucesso</string>
+    <string name="checklist_inserted">A checklist foi inserida</string>
     <string name="checklist_notinserted">Erro ao inserir a checklist</string>
     <string name="msg_deleteChecklist">Tem certeza que deseja excluir essas checklists?</string>
     <string name="msg_deleteTag">Tem certeza que deseja excluir essas tags?</string>
+    <string name="msg_deleteThisChecklist">Tem certeza que deseja excluir essa checklist?</string>
+    <string name="msg_deleteThisTag">Tem certeza que deseja excluir essa tag?</string>
     <string name="delete_title">Remoção</string>
+    <string name="checklist_updated">A checklist foi atualizada</string>
+    <string name="checklist_notupdated">Erro ao atualizar a checklist</string>
+    <string name="tag_updated">A tag foi atualizada</string>
+    <string name="tag_notupdated">Erro ao atualizar a tag</string>
 
     <!-- BOTÕES -->
     <string name="btnYes">Sim</string>
