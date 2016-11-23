@@ -1,9 +1,11 @@
 package com.weebly.taggtracker.tagtracker;
 
-import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.design.widget.TabLayout;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.MifareUltralight;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,13 +15,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import static java.sql.DriverManager.println;
 
@@ -28,7 +31,10 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
     private String tituloChecklist; //checklist que será visualizada ou editada
     private Toolbar toolbar;
     private ArrayList<String> array;
-
+    private NfcAdapter mNfcAdapter;
+    private PendingIntent pendingIntent;
+    private Tag mytag;
+    private ListView listView;
 
     /* *********************************************************************************************
      * GETTERS E SETTERS
@@ -82,6 +88,11 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Habilitando o NFC
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
+                getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             setTituloChecklist(extras.getString("checklist-visual-key"));
@@ -99,25 +110,24 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
         int d =  bd.buscaIdChecklist(getTituloChecklist());
 
         array = bd.leItensListas(String.valueOf(d));
-        adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, array);
+        adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, array);
 
 
         //Colocamos o adaptador na listview
-        final ListView listView = (ListView) findViewById(R.id.listviewTags);
+        listView = (ListView) findViewById(R.id.listviewTags);
 
         if (adaptador == null){
             finish();
         }
         listView.setAdapter(adaptador);
 
-
         //Comportamento para checar a checklist
-        View btnCheck = findViewById(R.id.btnChecarChecklist);
+        /*View btnCheck = findViewById(R.id.btnChecarChecklist);
         btnCheck.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                //faz alguma coisa
+                finish();
             }
         });
 
@@ -128,7 +138,7 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
             public void onClick(View v) {
                 finish();
             }
-        });
+        });*/
 
     }
 
@@ -217,6 +227,94 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
         startActivity(it);
 
         finish();
+    }
+
+    /* ********************************************************************************************
+        MÉTODOS RELACIONADOS AO NFC
+     ******************************************************************************************** */
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /**
+         * It's important, that the activity is in the foreground (resumed). Otherwise
+         * an IllegalStateException is thrown.
+         */
+
+        if (mNfcAdapter != null) {
+            mNfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        /**
+         * Call this before onPause, otherwise an IllegalArgumentException is thrown as well.
+         */
+
+        if (mNfcAdapter != null) {
+            mNfcAdapter.disableForegroundDispatch(this);
+        }
+
+        super.onPause();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent){
+        if (mNfcAdapter != null) {
+            if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+                mytag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                int detectedTagId = readTag(mytag);
+                for (int i=0; i <= listView.getLastVisiblePosition(); i++) {
+                    if (bd.buscaIdTag(array.get(i)) == detectedTagId) {
+                        Toast.makeText(this, array.get(i) + " detectado(a)!", Toast.LENGTH_LONG).show();
+                        listView.setItemChecked(i,true);
+                        if (listView.getLastVisiblePosition()+1 == listView.getCheckedItemCount()) {
+                            // checklist com todos os itens checados
+
+                            // 1. Instantiate an AlertDialog.Builder with its constructor
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                            // 2. Chain together various setter methods to set the dialog characteristics
+                            builder.setMessage("Todos os itens foram detectados!")
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            finish();
+                                        }
+                                    });
+                            // 3. Get the AlertDialog from create()
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public int readTag(Tag tag) {
+        MifareUltralight mifare = MifareUltralight.get(tag);
+        try {
+            mifare.connect();
+            byte[] payload = mifare.readPages(4);
+            byte[] fourBytes = Arrays.copyOfRange(payload,0,4);
+            String fourBytesToString = new String(fourBytes, Charset.forName("UTF-8"));
+            int idNumber = Integer.parseInt(new String(fourBytesToString));
+
+            return idNumber;    //new String(Integer.toString(idNumber));
+        } catch (IOException e) {
+            Toast.makeText(this, "Ocorreu um problema ao ler a tag. Tente novamente.", Toast.LENGTH_LONG).show();
+        } finally {
+            if (mifare != null) {
+                try {
+                    mifare.close();
+                }
+                catch (IOException e) {
+                    Toast.makeText(this, "Ocorreu um problema ao ler a tag. Tente novamente.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+        return -1;
     }
 
 }

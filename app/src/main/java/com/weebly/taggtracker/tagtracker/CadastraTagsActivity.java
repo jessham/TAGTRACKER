@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -26,8 +27,9 @@ public class CadastraTagsActivity extends AppCompatActivity {
     private PendingIntent pendingIntent;
     private Tag mytag;
     private String rotulo;
+    private String rotuloOriginal;
     private boolean modoEditar;
-    boolean savedInDatabase;
+    private boolean clicouSalvar;
 
 
     /* ********************************************************************************************
@@ -67,7 +69,11 @@ public class CadastraTagsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastra_tags);
 
-        savedInDatabase = false;
+        //Configura a toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         rotulo = new String("");
 
         // Habilitando o NFC
@@ -85,13 +91,22 @@ public class CadastraTagsActivity extends AppCompatActivity {
 
             EditText txtTitulo = (EditText) findViewById(R.id.txtTitleTag);
             txtTitulo.setText(getRotulo());
+            rotuloOriginal = getRotulo();
         }
+
+        // configurar o subtítulo
+        TextView subtitle = (TextView) findViewById(R.id.txtAddTag);
+        if (isModoEditar())
+            subtitle.setText("Editar tag");
+        else
+            subtitle.setText("Adicionar tag");
 
         //Comportamento para salvar a tag
         View btnSalvar = findViewById(R.id.btnSalvarTag);
         btnSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clicouSalvar = true;
                 salvaTag();
             }
         });
@@ -106,12 +121,12 @@ public class CadastraTagsActivity extends AppCompatActivity {
         } );
     }
 
-    @Override
+    /*@Override
     public void onBackPressed() {
         // 1. Instantiate an AlertDialog.Builder with its constructor
         AlertDialog.Builder builder = new AlertDialog.Builder(CadastraTagsActivity.this);
         // 2. Chain together various setter methods to set the dialog characteristics
-        builder.setMessage("O item foi salvo, mas não possuirá nenhuma tag atribuída à ela. \nÉ possível realizar esta tarefa depois.")
+        builder.setMessage("O item não será salvo sem ter uma tag NFC atribuída à ela")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         finish();
@@ -132,7 +147,7 @@ public class CadastraTagsActivity extends AppCompatActivity {
         // 3. Get the AlertDialog from create()
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
+    }*/
 
     @Override
     protected void onResume() {
@@ -165,15 +180,21 @@ public class CadastraTagsActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent){
         if (mNfcAdapter != null) {
             if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-                if (savedInDatabase) {
-                    // get tag info
-                    mytag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-                    int idTag = bd.buscaIdTag((rotulo));
-                    if (idTag > -1) {
-                        writeTag(mytag, bd.buscaIdTag(rotulo));
-                        Toast.makeText(this, "A tag foi detectada e salva com sucesso", Toast.LENGTH_LONG).show();
+                mytag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                if (clicouSalvar) {
+                    if (!isModoEditar()) {
+                        writeTag(mytag, bd.retornaProxIDTags());
+                        if (bd.insereTags(rotulo)) {
+                            Toast.makeText(this, "A tag foi detectada e salva", Toast.LENGTH_LONG).show();
+                            setResult(Activity.RESULT_OK, getIntent());
+                        }
                     } else {
-                        Toast.makeText(this, "Ocorreu um problema ao salvar", Toast.LENGTH_LONG).show();
+                        int editedTagId = bd.buscaIdTag(rotuloOriginal);
+                        writeTag(mytag, editedTagId);
+                        if (bd.atualizatags(rotulo, editedTagId)) {
+                            Toast.makeText(this, "A tag foi editada", Toast.LENGTH_LONG).show();
+                            setResult(Activity.RESULT_OK, getIntent());
+                        }
                     }
                     finish();
                 }
@@ -199,14 +220,14 @@ public class CadastraTagsActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             //Log.e(TAG, "IOException while closing MifareUltralight...", e);
-            Toast.makeText(this, "Ocorreu um problema ao salvar", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Ocorreu um problema ao salvar na tag", Toast.LENGTH_LONG).show();
             finish();
         } finally {
             try {
                 ultralight.close();
             } catch (IOException e) {
                 //Log.e(TAG, "IOException while closing MifareUltralight...", e);
-                Toast.makeText(this, "Ocorreu um problema ao salvar", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Ocorreu um problema ao salvar na tag", Toast.LENGTH_LONG).show();
                 finish();
             }
         }
@@ -243,54 +264,15 @@ public class CadastraTagsActivity extends AppCompatActivity {
             }
         }
 
-        if (bd.insereTags(txtTitulo.getText().toString())) {
-            savedInDatabase = true;
-            rotulo = txtTitulo.getText().toString();
-
-            // 1. Instantiate an AlertDialog.Builder with its constructor
-            AlertDialog.Builder builder = new AlertDialog.Builder(CadastraTagsActivity.this);
-            // 2. Chain together various setter methods to set the dialog characteristics
-            builder.setMessage("Aproxime uma tag NFC para completar o cadastro").setTitle("");
-            // 3. Get the AlertDialog from create()
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-            //Intent returnIntent = new Intent();
-            setResult(Activity.RESULT_OK, getIntent());
-            //finish();
-        }
-
-        //txtTitulo.setText("");
+        rotulo = txtTitulo.getText().toString();
+        // 1. Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(CadastraTagsActivity.this);
+        // 2. Chain together various setter methods to set the dialog characteristics
+        builder.setMessage("Aproxime uma tag NFC para completar o cadastro").setTitle("");
+        // 3. Get the AlertDialog from create()
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
     }
-
-
-
-
-
-
-    public void salva(){
-
-        gravaTag();
-        if (verificaGravacao()) {
-            //salva no bd
-
-        } else {
-            //aparece mensagem instruindo ou avisando
-            //dependendo do comportamento return ou salva();
-        }
-
-    }
-
-    public void gravaTag(){
-        //tenta umas 3 vezes
-    }
-
-    public boolean verificaGravacao(){
-
-        return true;
-    }
-
-
 }
 

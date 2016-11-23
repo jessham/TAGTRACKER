@@ -144,9 +144,14 @@ public class TelaTagsActivity extends ListFragment {
             configuraToolbar();
         }
 
-        VisualizaTagActivity visualizacao = new VisualizaTagActivity();
+        /*VisualizaTagActivity visualizacao = new VisualizaTagActivity();
         Intent it = new Intent(getActivity(), visualizacao.getClass());
         it.putExtra("tag-visual-key", l.getItemAtPosition(position).toString().trim());
+        getActivity().startActivityForResult(it, 4);*/
+
+        CadastraTagsActivity ct = new CadastraTagsActivity();
+        Intent it = new Intent(getActivity(), ct.getClass());
+        it.putExtra("tag-edit-key", l.getItemAtPosition(position).toString().trim());
         getActivity().startActivityForResult(it, 4);
     }
 

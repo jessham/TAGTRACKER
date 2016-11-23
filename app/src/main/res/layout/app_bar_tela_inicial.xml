@@ -63,7 +63,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_input_add"
         android:tint="#ffffff"
-        app:backgroundTint="#f8e71c"
+        app:backgroundTint="?android:attr/colorAccent"
         android:onClick="abreMenu" />
 
     <!-- View pager to swipe views -->

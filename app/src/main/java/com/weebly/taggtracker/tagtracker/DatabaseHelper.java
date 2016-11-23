@@ -194,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     null,
                     values);
             db.close();
-            Toast.makeText(contexto, R.string.checklist_inserted,Toast.LENGTH_SHORT).show();
+            //Toast.makeText(contexto, R.string.checklist_inserted,Toast.LENGTH_SHORT).show();
         }  catch (Exception e){
             Toast.makeText(contexto, R.string.checklist_notinserted,Toast.LENGTH_SHORT).show();
             return false;
@@ -498,7 +498,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean atualizaChecklists(String titulo, int checklistsID) {
         try {
-            Toast.makeText(contexto, "Começa atualiza para o id = " + String.valueOf(checklistsID), Toast.LENGTH_LONG).show();
+            //Toast.makeText(contexto, "Começa atualiza para o id = " + String.valueOf(checklistsID), Toast.LENGTH_LONG).show();
             // New value for one column
             ContentValues values = new ContentValues();
             values.put(tabelaChecklists.colunaTitulo, titulo);
@@ -521,7 +521,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    public void atualizatags(String titulo, int tagsID) {
+    public boolean atualizatags(String titulo, int tagsID) {
         try {
             // New value for one column
             ContentValues values = new ContentValues();
@@ -536,9 +536,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     values,
                     selection,
                     selectionArgs);
+
+            return true;
         }  catch (Exception e){
-            Toast.makeText(contexto,"ERROR" + e.getMessage(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(contexto, "Erro ao editar a tag",Toast.LENGTH_SHORT).show();
         }
+        return false;
     }
 
 

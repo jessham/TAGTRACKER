@@ -220,6 +220,7 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
 
 
         } else if (bd.insereGeral(txtTitulo.getText().toString(), itensSelecionados)) {
+            Toast.makeText(this, R.string.checklist_inserted,Toast.LENGTH_SHORT).show();
             setResult(Activity.RESULT_OK, getIntent());
             finish();
         }
