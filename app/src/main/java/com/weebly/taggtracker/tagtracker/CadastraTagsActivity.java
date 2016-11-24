@@ -373,12 +373,12 @@ public class CadastraTagsActivity extends AppCompatActivity {
 
                 android.support.v7.app.AlertDialog alert = builder.create();
                 alert.show();
+            } else {
+                if (bd.deletaTags(aDeletarIds))
+                    setResult(Activity.RESULT_OK, getIntent());
+                finish();
             }
 
-        } else {
-            if (bd.deletaTags(aDeletarIds))
-                setResult(Activity.RESULT_OK, getIntent());
-            finish();
         }
         return true;
     }

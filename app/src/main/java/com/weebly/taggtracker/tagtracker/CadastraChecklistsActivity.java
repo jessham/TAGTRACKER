@@ -215,11 +215,16 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
 
 
         if (isModoEditar()) {
+
             int pos = bd.buscaIdChecklist(getTituloChecklist());
-            if (bd.atualizaChecklists(txtTitulo.getText().toString(), pos)) {
+
+
+            if (bd.atualizaChecklists(txtTitulo.getText().toString(), pos, itensSelecionados)){
+                Toast.makeText(this, R.string.checklist_updated,Toast.LENGTH_SHORT).show();
                 setResult(Activity.RESULT_OK, getIntent());
                 finish();
-            }
+            } else Toast.makeText(this, R.string.checklist_notupdated,Toast.LENGTH_SHORT).show();
+
 
 
         } else if (bd.insereGeral(txtTitulo.getText().toString(), itensSelecionados)) {

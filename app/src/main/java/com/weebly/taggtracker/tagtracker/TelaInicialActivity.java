@@ -495,11 +495,10 @@ public class TelaInicialActivity extends AppCompatActivity
                     alert.show();
 
 
+                } else {
+                    if (bdhelper.deletaTags(aDeletarIds.get(j)))
+                        setSucessoDeletar(true);
                 }
-
-            } else {
-                if (bdhelper.deletaTags(aDeletarIds.get(j)))
-                    setSucessoDeletar(true);
             }
 
         }

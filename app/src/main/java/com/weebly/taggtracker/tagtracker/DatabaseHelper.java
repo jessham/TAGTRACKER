@@ -105,8 +105,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int idchecklist = buscaIdChecklist(titulo);
         if (idchecklist == -1) return false;
 
-
-
         /*depois retorna o id das tags selecionadas*/
         List<String> lista = Arrays.asList(rotulo.split(","));
 
@@ -526,7 +524,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    public boolean atualizaChecklists(String titulo, int checklistsID) {
+    public boolean atualizaChecklists(String titulo, int checklistsID, String rotulo) {
         try {
             //Toast.makeText(contexto, "Começa atualiza para o id = " + String.valueOf(checklistsID), Toast.LENGTH_LONG).show();
             // New value for one column
@@ -543,6 +541,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     values,
                     selection,
                     selectionArgs);
+
+
+
+            //Agora atualiza os itens selecionados
+            deletaAssocia(checklistsID, -1);
+
+            /*depois retorna o id das tags selecionadas*/
+            List<String> lista = Arrays.asList(rotulo.split(","));
+
+            List<Integer> list = new ArrayList<>();
+            for (int i = 0; i < lista.size(); i++){
+                String a = lista.get(i);
+                int ab = buscaIdTag(a);
+                if (ab < 0 ) return false;
+                else list.add(ab);
+                if (list.get(i) == -1) return false;
+            }
+
+
+            //Finalmente, insere na tabela associa
+            for (int i = 0; i < lista.size(); i++){
+                if (!insereAssocia(checklistsID, list.get(i)))
+                    return false;
+            }
+
+
+
+
+
             Toast.makeText(contexto,R.string.checklist_updated,Toast.LENGTH_SHORT).show();
             return true;
         } catch (Exception e){
