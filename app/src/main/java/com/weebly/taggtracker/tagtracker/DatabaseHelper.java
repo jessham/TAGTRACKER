@@ -197,6 +197,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
            // Toast.makeText(contexto, R.string.checklist_notinserted,Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        //
         return true;
     }
 
