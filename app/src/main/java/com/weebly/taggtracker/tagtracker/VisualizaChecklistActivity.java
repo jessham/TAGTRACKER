@@ -121,25 +121,8 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
             finish();
         }
         listView.setAdapter(adaptador);
+        listView.setEnabled(false);
 
-        //Comportamento para checar a checklist
-        /*View btnCheck = findViewById(R.id.btnChecarChecklist);
-        btnCheck.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        //Comportamento para cancelar visualizar a tag
-        View btnCancelar = findViewById(R.id.btnCancelarVisualChecklist);
-        btnCancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });*/
 
     }
 
