@@ -9,6 +9,9 @@ import android.nfc.tech.MifareUltralight;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,6 +22,7 @@ import android.content.DialogInterface;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CadastraTagsActivity extends AppCompatActivity {
     private DatabaseHelper bd;
@@ -57,7 +61,13 @@ public class CadastraTagsActivity extends AppCompatActivity {
         bd = new DatabaseHelper(this);
     }
 
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
 
+    public void setToolbar(Toolbar toolbar) {
+        this.toolbar = toolbar;
+    }
 
     /* ********************************************************************************************
         MÉTODOS DE INICIALIZAÇÃO
@@ -70,7 +80,7 @@ public class CadastraTagsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cadastra_tags);
 
         //Configura a toolbar
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_cadastraTag);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -80,7 +90,6 @@ public class CadastraTagsActivity extends AppCompatActivity {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(CadastraTagsActivity.this);
         pendingIntent = PendingIntent.getActivity(CadastraTagsActivity.this, 0, new Intent(CadastraTagsActivity.this,
                 getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-
 
 
         //Verifica se esta no modulo de edicao
@@ -96,10 +105,13 @@ public class CadastraTagsActivity extends AppCompatActivity {
 
         // configurar o subtítulo
         TextView subtitle = (TextView) findViewById(R.id.txtAddTag);
-        if (isModoEditar())
+        if (isModoEditar()) {
             subtitle.setText("Editar tag");
-        else
+            toolbar.setTitle(R.string.title_VisualizaTagsActivity);
+        } else {
             subtitle.setText("Adicionar tag");
+            toolbar.setTitle(R.string.title_CadastraTagsActivity);
+        }
 
         //Comportamento para salvar a tag
         View btnSalvar = findViewById(R.id.btnSalvarTag);
@@ -115,10 +127,10 @@ public class CadastraTagsActivity extends AppCompatActivity {
         View btnCancelar = findViewById(R.id.btnCancelartag);
         btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 finish();
             }
-        } );
+        });
     }
 
     /*@Override
@@ -177,7 +189,7 @@ public class CadastraTagsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent){
+    protected void onNewIntent(Intent intent) {
         if (mNfcAdapter != null) {
             if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
                 mytag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -234,9 +246,8 @@ public class CadastraTagsActivity extends AppCompatActivity {
     }
 
 
-
-    public void salvaTag(){
-        final EditText txtTitulo = (EditText ) findViewById(R.id.txtTitleTag);
+    public void salvaTag() {
+        final EditText txtTitulo = (EditText) findViewById(R.id.txtTitleTag);
 
         //Verifica se vazio
         if (txtTitulo.getText().toString().isEmpty()) {
@@ -274,5 +285,108 @@ public class CadastraTagsActivity extends AppCompatActivity {
         dialog.show();
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+
+        if (isModoEditar()) {
+            new MenuInflater(this).inflate(R.menu.menu_toolbar, menu);
+            apareceMenu(false, true, false);
+            toolbar.getMenu().findItem(R.id.app_bar_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        } else
+            return true;
+
+        return (super.onCreateOptionsMenu(menu));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+
+            case R.id.app_bar_delete:
+                deleta();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    //Configura as opções visiveis do menu da toolbar
+    public void apareceMenu(boolean pesquisa, boolean deleta, boolean edita) {
+        getToolbar().getMenu().findItem(R.id.app_bar_delete).setVisible(deleta);
+        getToolbar().getMenu().findItem(R.id.app_bar_search).setVisible(pesquisa);
+        getToolbar().getMenu().findItem(R.id.app_bar_edit).setVisible(edita);
+    }
+
+
+    public boolean deleta() {
+        //Toast.makeText(getApplicationContext(), "Pegando os ids", Toast.LENGTH_SHORT).show();
+        final int aDeletarIds = bd.buscaIdTag(getRotulo());
+
+
+        //procura saber se tag eh a ultima da checklist
+        final List<Integer> resp = bd.buscaAssocia(String.valueOf(aDeletarIds));
+
+        if (resp != null) {
+            if (resp.size() > 0) {
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+                builder.setTitle(R.string.delete_title);
+                builder.setMessage(R.string.msg_deleteAssocia);
+
+
+                builder.setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        for (int k = 0; k < resp.size(); k++) {
+                            bd.deletaAssocia(resp.get(k), -1);
+                            bd.deletaChecklists(resp.get(k));
+                        }
+
+
+                        if (bd.deletaTags(aDeletarIds)) {
+                            Toast.makeText(getApplicationContext(),R.string.tag_deleted,Toast.LENGTH_SHORT).show();
+                            setResult(Activity.RESULT_OK, getIntent());
+                            finish();
+                        }
+
+                        dialog.dismiss();
+                    }
+
+                });
+
+                builder.setNegativeButton(R.string.btnNo, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        return;
+                    }
+                });
+
+                android.support.v7.app.AlertDialog alert = builder.create();
+                alert.show();
+            }
+
+        } else {
+            if (bd.deletaTags(aDeletarIds))
+                setResult(Activity.RESULT_OK, getIntent());
+            finish();
+        }
+        return true;
+    }
 }
+
+
+
+
+
+
 

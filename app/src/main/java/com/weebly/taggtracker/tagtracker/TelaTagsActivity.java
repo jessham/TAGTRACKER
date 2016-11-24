@@ -108,6 +108,7 @@ public class TelaTagsActivity extends ListFragment {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 ativaModoSelecao = true;
 
+
                 //Ajusta a lista de itens selecionados
                 if (!selecionados.contains(position)) {
                     selecionados.add(position);
@@ -152,7 +153,7 @@ public class TelaTagsActivity extends ListFragment {
         CadastraTagsActivity ct = new CadastraTagsActivity();
         Intent it = new Intent(getActivity(), ct.getClass());
         it.putExtra("tag-edit-key", l.getItemAtPosition(position).toString().trim());
-        getActivity().startActivityForResult(it, 4);
+        getActivity().startActivityForResult(it, 2);
     }
 
 

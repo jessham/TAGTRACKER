@@ -249,6 +249,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return resp;
     }
 
+    public List<Integer> buscaAssocia(String tag){
+        List<Integer> resp = new ArrayList<Integer>();
+
+        try {
+            SQLiteDatabase db = getReadableDatabase();
+            Cursor cursor = db.rawQuery(
+                    "select " + tabelaAssocia.checklistsID +
+                    " from " + tabelaAssocia.nomeTabela +
+                    " where " + tabelaAssocia.tagsID + " = ?  and " + tabelaAssocia.checklistsID + " in ( " +
+                            " select " + tabelaAssocia.checklistsID +
+                            " from " + tabelaAssocia.nomeTabela +
+                            " group by " + tabelaAssocia.checklistsID +
+                            " having count(" + tabelaAssocia.tagsID + ") = 1)", new String[] {tag});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    String linea = cursor.getString(cursor.getColumnIndex(tabelaAssocia.checklistsID));
+                    resp.add(Integer.parseInt(linea));
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+        }  catch (Exception e){
+            Toast.makeText(contexto,"ERRO BUS ASS : " + e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+        return resp;
+    }
+
 
     //LEITURA
     public ArrayList<String> leChecklist(){
@@ -370,6 +399,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.delete(tabelaAssocia.nomeTabela, selection3, selectionArgs3);
 
                 db.close();
+
                 return true;
 
             }  catch (Exception e){
@@ -423,8 +453,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = getWritableDatabase();
             db.delete(tabelaTags.nomeTabela, selection, selectionArgs);
 
-
             db.close();
+
             return true;
 
         }  catch (Exception e){

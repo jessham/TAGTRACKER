@@ -95,6 +95,9 @@ public class TelaInicialActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
+
+        /*for (int i = 0; i < 15; i++)
+        bdhelper.insereTags("tag " + i);*/
     }
 
 
@@ -166,8 +169,10 @@ public class TelaInicialActivity extends AppCompatActivity
 
         if (mudaTab) setTab(1);
         if (toolbar.getSubtitle() != null)
-            if (toolbar.getSubtitle().toString() == "")
+            if (toolbar.getSubtitle().toString() != "")
                 toolbar.setSubtitle("");
+
+
 
     }
 
@@ -278,6 +283,9 @@ public class TelaInicialActivity extends AppCompatActivity
         if (requestCode == 3 || requestCode == 4){
             atualizaConteudo();
         }
+
+        telaT.deselecionaTudo();
+        telaC.deselecionaTudo();
     }
 
 
@@ -369,11 +377,15 @@ public class TelaInicialActivity extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (getTab() == 0){
-                    if (deletaChecklist())
+                    if (deletaChecklist()) {
+                        Toast.makeText(getApplicationContext(),R.string.checklist_deleted,Toast.LENGTH_SHORT).show();
                         setSucessoDeletar(true);
+                    }
                 } else {
-                    if (deletaTag())
+                    if (deletaTag()) {
+
                         setSucessoDeletar(true);
+                    }
                 }
                 dialog.dismiss();
             }
@@ -427,14 +439,70 @@ public class TelaInicialActivity extends AppCompatActivity
         if (aDeletar.isEmpty()) return false;
 
         //Toast.makeText(getApplicationContext(), "Pegando os ids", Toast.LENGTH_SHORT).show();
-        List<Integer> aDeletarIds = new ArrayList<>();
+        final List<Integer> aDeletarIds = new ArrayList<>();
         for (int i = 0; i < aDeletar.size(); i++)
             aDeletarIds.add( bdhelper.buscaIdTag(aDeletar.get(i)) );
 
        // Toast.makeText(getApplicationContext(), "Começando a deletar", Toast.LENGTH_SHORT).show();
         //Por fim, deleta tudo
-        for (int j = 0; j < aDeletarIds.size(); j++)
-            bdhelper.deletaTags(aDeletarIds.get(j));
+        for (int j = 0; j < aDeletarIds.size(); j++) {
+            //procura saber se tag eh a ultima da checklist
+            final List<Integer> resp = bdhelper.buscaAssocia(aDeletarIds.get(j).toString());
+
+
+            if (resp != null) {
+                if (resp.size() > 0) {
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.delete_title);
+                    builder.setMessage(R.string.msg_deleteAssocia);
+                    final int numero = j;
+
+
+                    builder.setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            for (int k = 0; k < resp.size(); k++) {
+                                bdhelper.deletaAssocia(resp.get(k), -1);
+                                bdhelper.deletaChecklists(resp.get(k));
+                            }
+
+                            if (bdhelper.deletaTags(aDeletarIds.get(numero))) {
+                                Toast.makeText(getApplicationContext(),R.string.tag_deleted,Toast.LENGTH_SHORT).show();
+                                setSucessoDeletar(true);
+                            }
+
+                            dialog.dismiss();
+                        }
+
+                    });
+
+                    builder.setNegativeButton(R.string.btnNo, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (getTab() == 0)
+                                telaC.deselecionaTudo();
+                            else telaT.deselecionaTudo();
+
+                            dialog.dismiss();
+                            return;
+                        }
+                    });
+
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
+
+                }
+
+            } else {
+                if (bdhelper.deletaTags(aDeletarIds.get(j)))
+                    setSucessoDeletar(true);
+            }
+
+        }
 
         return true;
     }

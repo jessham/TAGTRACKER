@@ -6,25 +6,17 @@
     android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/appbar_cadastraTag"
         android:layout_height="wrap_content"
         android:layout_width="match_parent">
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:toolbarId="@+id/toolbar"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="?attr/colorPrimary">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_cadastraTag"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_width="wrap_content"
+            app:titleTextColor="@color/common_google_signin_btn_text_dark_default"
+            android:layout_weight="1"></android.support.v7.widget.Toolbar>
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:padding="50dp"
-                android:layout_height="56dp"
-                app:title="@string/title_CadastraTagsActivity"
-                app:titleTextColor="@color/common_google_signin_btn_text_dark_default"></android.support.v7.widget.Toolbar>
-        </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
