@@ -148,9 +148,10 @@ public class TesteMetodos extends AndroidTestCase {
     @Test
     public void insereAssociaVazia(){
         DatabaseHelper x = new DatabaseHelper(mMockContext);
-        boolean resultado = x.insereAssocia(1,2);
+        boolean resultado = x.insereAssocia(1,-1);
         assertThat(resultado, is(false));
     }
+
 
 
 }
