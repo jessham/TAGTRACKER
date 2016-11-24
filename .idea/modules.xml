@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TAGTRACKER.iml" filepath="$PROJECT_DIR$/TAGTRACKER.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TAGTRACKER_Testados.iml" filepath="$PROJECT_DIR$/TAGTRACKER_Testados.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

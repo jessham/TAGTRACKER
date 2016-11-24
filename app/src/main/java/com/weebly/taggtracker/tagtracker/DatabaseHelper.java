@@ -145,7 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     values);
             db.close();
         } catch (Exception e){
-            Toast.makeText(contexto, e.getMessage(),Toast.LENGTH_SHORT).show();
+            //Toast.makeText(contexto, e.getMessage(),Toast.LENGTH_SHORT).show();
             return false;
         }
        return true;
@@ -167,9 +167,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     null,
                     values);
             db.close();
-            //Toast.makeText(contexto,R.string.tag_inserted,Toast.LENGTH_SHORT).show();
+            Toast.makeText(contexto,R.string.tag_inserted,Toast.LENGTH_SHORT).show();
         } catch (Exception e){
-            Toast.makeText(contexto,R.string.tag_notinserted,Toast.LENGTH_SHORT).show();
+           // Toast.makeText(contexto,R.string.tag_notinserted,Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -194,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             //Toast.makeText(contexto, R.string.checklist_inserted,Toast.LENGTH_SHORT).show();
         }  catch (Exception e){
-            Toast.makeText(contexto, R.string.checklist_notinserted,Toast.LENGTH_SHORT).show();
+           // Toast.makeText(contexto, R.string.checklist_notinserted,Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -219,7 +219,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             //Toast.makeText(contexto,"BUSCA TAG ID ()" + resp,Toast.LENGTH_LONG).show();
         }  catch (Exception e){
-            Toast.makeText(contexto,e.getMessage(),Toast.LENGTH_SHORT).show();
+           // Toast.makeText(contexto,e.getMessage(),Toast.LENGTH_SHORT).show();
         }
         return resp;
     }
@@ -242,7 +242,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             //Toast.makeText(contexto,"BUSCA CH ID ()" + resp,Toast.LENGTH_SHORT).show();
         }  catch (Exception e){
-            Toast.makeText(contexto,"BUSCA CH ID " + e.getMessage(),Toast.LENGTH_SHORT).show();
+           // Toast.makeText(contexto,"BUSCA CH ID " + e.getMessage(),Toast.LENGTH_SHORT).show();
         }
         return resp;
     }
