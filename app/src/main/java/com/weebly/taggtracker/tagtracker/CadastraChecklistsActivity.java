@@ -103,6 +103,9 @@ public class CadastraChecklistsActivity extends AppCompatActivity {
         final ListView listView = (ListView) findViewById(R.id.listviewAddTags);
         listView.setAdapter(adaptador);
 
+        //Impede a seleçao das checkboxs pelo usuario
+
+
         //Seleciona os itens que for editar
         if (isModoEditar()) {
             if (itens != null)

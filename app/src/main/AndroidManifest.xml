@@ -38,19 +38,54 @@
         <activity
             android:name=".CompraTagsActivity"
             android:label="COMPRA DE TAGS"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+
+            android:parentActivityName=".TelaInicialActivity">
+
+        <!-- Parent activity meta-data to support 4.0 and lower -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.weebly.taggtracker.tagtracker.TelaInicialActivity" />
+        </activity>
+
         <activity
             android:name=".ComoUsarActivity"
             android:label="COMO USAR O APP"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".TelaInicialActivity">
+
+        <!-- Parent activity meta-data to support 4.0 and lower -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.weebly.taggtracker.tagtracker.TelaInicialActivity" />
+        </activity>
+
         <activity
             android:name=".SobreActivity"
             android:label="SOBRE O TAGTRACKER"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+
+            android:parentActivityName=".TelaInicialActivity">
+
+        <!-- Parent activity meta-data to support 4.0 and lower -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.weebly.taggtracker.tagtracker.TelaInicialActivity" />
+        </activity>
+
         <activity
             android:name=".PremiumActivity"
             android:label="TAGTRACKER PREMIUM"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+
+            android:parentActivityName=".TelaInicialActivity">
+
+        <!-- Parent activity meta-data to support 4.0 and lower -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.weebly.taggtracker.tagtracker.TelaInicialActivity" />
+        </activity>
+
         <activity
             android:name=".AlgunsTestes"
             android:label="@string/title_activity_alguns_testes"

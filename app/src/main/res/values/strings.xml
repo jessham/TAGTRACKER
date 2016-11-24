@@ -14,7 +14,11 @@
     <string name="title_CadastraTagsActivity">Cadastrar tags</string>
     <string name="title_VisualizaChecklistsActivity">Visualizar checklist</string>
     <string name="title_VisualizaTagsActivity">Visualizar tag</string>
-    <string name="title_EditaChecklistsActivity">Editar checklist</string>
+
+    <string name="title_comoUsar">Como Usar</string>
+    <string name="title_compraTag">Comprar Tags</string>
+    <string name="title_premium">Premium Activity</string>
+    <string name="title_sobre">Sobre o TAGTRACKER</string>
 
 
     <!-- SOBRE NFC -->

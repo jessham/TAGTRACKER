@@ -113,6 +113,7 @@ public class VisualizaChecklistActivity extends AppCompatActivity {
         adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, array);
 
 
+
         //Colocamos o adaptador na listview
         listView = (ListView) findViewById(R.id.listviewTags);
 
