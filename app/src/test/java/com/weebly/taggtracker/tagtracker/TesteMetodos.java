@@ -37,11 +37,12 @@ public class TesteMetodos extends AndroidTestCase {
     private static final boolean CaseFalso = false;
 
     @Mock
-    Toast toast;
+    Context mMockContext;
+
 
 
     @Mock
-    Context mMockContext;
+    Toast toast;
 
 
     @Mock
@@ -134,6 +135,38 @@ public class TesteMetodos extends AndroidTestCase {
         assertThat(resultado, is(false));
 
     }
+    @Test
+    public void insereCheckList1Caracter(){
+        DatabaseHelper x = new DatabaseHelper(mMockContext);
+        boolean resultado = x.insereChecklist("1");
+        assertThat(resultado, is(false));
+
+    }
+
+    @Test
+    public void insereTagsMenorQue3(){
+        DatabaseHelper x = new DatabaseHelper(mMockContext);
+        boolean resultado = x.insereTags("12");
+        assertThat(resultado, is(false));
+    }
+    
+    @Test
+    public void insereCheckListMenos3(){
+        DatabaseHelper x = new DatabaseHelper(mMockContext);
+        boolean resultado = x.insereChecklist("12");
+        assertThat(resultado, is(false));
+
+    }
+
+
+
+    @Test
+    public void insereCheckListExtensa(){
+        DatabaseHelper x = new DatabaseHelper(mMockContext);
+        boolean resultado = x.insereChecklist("12345678912820928902829802789978097");
+        assertThat(resultado, is(false));
+
+    }
 
     @Test
     public void insereTagsVazia(){
@@ -146,12 +179,19 @@ public class TesteMetodos extends AndroidTestCase {
 
 
     @Test
-    public void insereAssociaNegativa(){
+    public void insereAssociaNegativaTag(){
+        DatabaseHelper x = new DatabaseHelper(mMockContext);
+        boolean resultado = x.insereAssocia(-1,1);
+        assertThat(resultado, is(false));
+    }
+
+
+    @Test
+    public void insereAssociaNegativaCheck(){
         DatabaseHelper x = new DatabaseHelper(mMockContext);
         boolean resultado = x.insereAssocia(1,-1);
         assertThat(resultado, is(false));
     }
-
 
     //public boolean atualizatags(String titulo, int tagsID) {
     @Test
@@ -164,9 +204,19 @@ public class TesteMetodos extends AndroidTestCase {
     @Test
     public void atualizaTagsVazia(){
         DatabaseHelper x = new DatabaseHelper(mMockContext);
+        boolean resultado = x.atualizatags("",4);
+        assertThat(resultado, is(false));
+    }
+
+    @Test
+    public void atualizarParametrosEquivo(){
+        DatabaseHelper x = new DatabaseHelper(mMockContext);
         boolean resultado = x.atualizatags("",-1);
         assertThat(resultado, is(false));
     }
+
+
+
 
 
 }
