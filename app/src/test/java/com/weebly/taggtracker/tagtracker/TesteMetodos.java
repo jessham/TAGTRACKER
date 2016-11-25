@@ -146,12 +146,27 @@ public class TesteMetodos extends AndroidTestCase {
 
 
     @Test
-    public void insereAssociaVazia(){
+    public void insereAssociaNegativa(){
         DatabaseHelper x = new DatabaseHelper(mMockContext);
         boolean resultado = x.insereAssocia(1,-1);
         assertThat(resultado, is(false));
     }
 
+
+    //public boolean atualizatags(String titulo, int tagsID) {
+    @Test
+    public void atualizaTagsNegativa(){
+        DatabaseHelper x = new DatabaseHelper(mMockContext);
+        boolean resultado = x.atualizatags("nome",-1);
+        assertThat(resultado, is(false));
+    }
+
+    @Test
+    public void atualizaTagsVazia(){
+        DatabaseHelper x = new DatabaseHelper(mMockContext);
+        boolean resultado = x.atualizatags("",-1);
+        assertThat(resultado, is(false));
+    }
 
 
 }

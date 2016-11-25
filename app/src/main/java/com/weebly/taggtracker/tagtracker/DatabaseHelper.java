@@ -598,7 +598,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             return true;
         }  catch (Exception e){
-            Toast.makeText(contexto, "Erro ao editar a tag",Toast.LENGTH_SHORT).show();
+           // Toast.makeText(contexto, "Erro ao editar a tag",Toast.LENGTH_SHORT).show();
         }
         return false;
     }
