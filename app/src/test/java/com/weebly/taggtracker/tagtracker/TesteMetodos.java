@@ -149,7 +149,7 @@ public class TesteMetodos extends AndroidTestCase {
         boolean resultado = x.insereTags("12");
         assertThat(resultado, is(false));
     }
-    
+
     @Test
     public void insereCheckListMenos3(){
         DatabaseHelper x = new DatabaseHelper(mMockContext);
